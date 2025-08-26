@@ -8,7 +8,7 @@
     content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Ranking</title>
   <link rel="icon" type="image/png" href="favicon.png">
-  <style>
+ <style>
   :root{
     --bg: #0f1115;
     --panel: #151923;
@@ -35,12 +35,16 @@
     color: var(--text);
     font-family: var(--font);
     margin:0;
+    overflow-x: hidden; /* verhindert horizontales Scrollen */
   }
 
   .wrap{
     max-width: 1440px;
     margin: 40px auto 60px;
     padding: 0 20px;
+    display: flex;              /* sorgt für zentrierte Inhalte */
+    flex-direction: column;
+    align-items: center;
   }
 
   .title{
@@ -50,13 +54,15 @@
     margin: 0 0 24px;
     font-weight: 800;
     text-shadow: 0 2px 16px rgba(0,0,0,.4);
+    width: 100%;
   }
 
   .boards{
     display:grid;
     grid-template-columns: repeat(4, 1fr);
     gap: var(--gap);
-    justify-items: center;   /* mittig in den Grid-Spalten */
+    width: 100%;
+    justify-items: center;
     align-items: start;
   }
 
@@ -67,9 +73,9 @@
     padding: 14px 14px 10px;
     position: relative;
     overflow: hidden;
-    min-width: calc(var(--num-w) + var(--name-w) + var(--je-w) + 32px);
-    width: calc(var(--num-w) + var(--name-w) + var(--je-w) + 32px); /* feste Breite */
-    margin-inline: auto; /* mittig */
+    max-width: calc(var(--num-w) + var(--name-w) + var(--je-w) + 32px);
+    width: 100%;
+    margin-inline: auto;
   }
 
   /* Leuchtende blaue Umrandung NUR beim Tagesranking */
@@ -173,15 +179,15 @@
     100%{ background-position: -100% 0; }
   }
 
-  /* ===== Responsiv: iPad & Handy untereinander, schön mittig ===== */
+  /* ===== Responsiv: iPad & Handy untereinander, mittig ===== */
 
-  /* iPad & kleiner: EINSPALTIG und mittig */
+  /* iPad & kleiner */
   @media (max-width: 1024px){
     .boards{ grid-template-columns: 1fr; justify-items: center; }
-    .wrap{ margin: 26px auto 40px; }
+    .wrap{ margin: 26px auto 40px; padding: 0 16px; }
   }
 
-  /* Handy: schmalere Spaltenbreiten */
+  /* Handy */
   @media (max-width: 640px){
     :root{
       --name-w: 220px;
@@ -189,9 +195,12 @@
       --num-w: 56px;
       --row-h: 54px;
     }
-    .boards{ grid-template-columns: 1fr; }
+    .boards{ grid-template-columns: 1fr; justify-items: center; }
+    .board{ width: 100%; max-width: 420px; }
+    .title{ font-size: 28px; } /* etwas kleiner für Handy */
   }
 </style>
+
 
 </head>
 <body>
