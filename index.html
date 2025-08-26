@@ -218,17 +218,29 @@
     // Feste 5 Slots pro Board (starr); wir füllen nur Texte — kein Verrutschen.
     const KEYS = ["day","week","month","year"];
 
-    function formatJE(value) {
-    // Versuchen Zahl daraus zu machen
-    const num = Number(value);
-    if (isNaN(num)) return value; // falls kein Zahl-String
+   function formatJE(value) {
+  if (value == null) return "";
 
-    // Deutsche Formatierung: 1.234,56
-    return num.toLocaleString("de-DE", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-    });
-    }
+  // Wenn schon Zahl:
+  if (typeof value === "number" && !isNaN(value)) {
+    return value.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  // Als String robust parsen:
+  let s = String(value).trim();
+
+  // Fall 1: Deutschformatiert "1.234,56" -> 1234.56
+  if (s.includes(",")) {
+    s = s.replace(/\./g, "").replace(",", ".");  // Tausenderpunkte raus, Komma -> Punkt
+  }
+  // sonst: "1234.56" bleibt so
+
+  const num = parseFloat(s);
+  if (isNaN(num)) return String(value); // Fallback: unverändert anzeigen
+
+  return num.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
     
     function makeEmptyRows(containerId){
       const c = document.getElementById(containerId);
