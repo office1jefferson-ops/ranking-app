@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
@@ -9,7 +9,7 @@
   <style>
     body{
       margin:0;background:radial-gradient(circle at top,#0a0f1e,#000);color:#fff;
-      font-family:"Poppins",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      font-family: "Poppins",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
       min-height:100vh;display:flex;justify-content:center;align-items:center;
     }
     .container{display:flex;flex-direction:column;gap:30px;width:95%;max-width:600px;text-align:center;}
@@ -17,24 +17,11 @@
     .block.tag{border:2px solid #3af;box-shadow:0 0 15px #3af,0 0 30px #08f inset}
     .block h2{margin:0 0 10px;font-size:1.4rem;letter-spacing:1px;text-transform:uppercase;text-shadow:0 0 8px rgba(255,255,255,.5)}
     table{width:100%;border-collapse:collapse;table-layout:fixed}
-    td{padding:6px 8px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative}
-    td.rank{width:40px;font-weight:700;text-align:center;position:relative;overflow:visible} /* wichtig: Krone nicht clippen */
+    td{padding:6px 8px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    td.rank{width:40px;font-weight:700;text-align:center}
     td.je{text-align:right;font-variant-numeric:tabular-nums}
     .gold{color:gold}.silver{color:silver}.bronze{color:#cd7f32}
-
-    /* Krone sitzt sichtbar auf der „1“ (leicht schräg) */
-    .crown{
-      position:absolute;
-      top:2px;                      /* tiefer = nicht abgeschnitten */
-      left:50%;
-      transform:translate(-50%,-35%) rotate(-18deg);
-      transform-origin:bottom center;
-      font-size:1.1rem;
-      text-shadow:0 0 6px gold,0 0 12px orange;
-      pointer-events:none;
-      z-index:2;                    /* über der Zahl */
-    }
-
+    .crown{position:absolute;font-size:1.2rem;transform:rotate(-20deg);top:43px;left:45px;text-shadow:0 0 6px gold,0 0 12px orange;pointer-events:none}
     .error{opacity:.8;font-size:.9rem;margin-top:6px}
   </style>
 </head>
@@ -42,6 +29,7 @@
   <div class="container">
     <div class="block tag">
       <h2>Tag</h2>
+      <div class="crown" id="crown" aria-hidden="true" hidden>👑</div>
       <table id="tag"></table>
       <div class="error" id="err-tag"></div>
     </div>
@@ -65,32 +53,29 @@
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbx0gxZelxsLaQJnA1nLfyp9k_PiAlptZsPsRrsVDGRwS_yHjCMsDM1ZKA3GBEwdCYi9/exec";
 
-    // Merker für Tag Platz 1 (Name) → nur bei Wechsel animieren
-    let prevDayTopName = null;
-
     function formatJEFromAPI(v){
-      const num = parseFloat(String(v).replace(",", "."));
-      if (isNaN(num)) return "";
-      return num.toLocaleString("de-DE", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      }) + " JE";
-    }
+  // Zahl sicher umwandeln
+  const num = parseFloat(String(v).replace(",", "."));
+  if (isNaN(num)) return "";
+  return num.toLocaleString("de-DE", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }) + " JE";
+}
+
 
     async function loadData(){
       try{
         const res = await fetch(API_URL + "?_ts=" + Date.now(), {cache:"no-store"});
         const data = await res.json();
+        // API-Keys: day, week, month, year  ✅
         renderBlock("tag",   data.day,   "err-tag",   true);
         renderBlock("woche", data.week,  "err-woche");
         renderBlock("monat", data.month, "err-monat");
         renderBlock("jahr",  data.year,  "err-jahr");
       }catch(e){
         console.error(e);
-        showErr("err-tag","API nicht erreichbar");
-        showErr("err-woche","");
-        showErr("err-monat","");
-        showErr("err-jahr","");
+        showErr("err-tag","API nicht erreichbar");showErr("err-woche","");showErr("err-monat","");showErr("err-jahr","");
       }
     }
 
@@ -103,12 +88,13 @@
     function renderBlock(tableId, arr, errId, isDay=false){
       const table = document.getElementById(tableId);
       if(!table) return;
-
       table.innerHTML = "";
       showErr(errId,"");
 
       const items = Array.isArray(arr) ? arr.slice(0,5) : [];
-      if(items.length === 0){ showErr(errId,"Keine Daten"); }
+      if(items.length === 0){
+        showErr(errId,"Keine Daten");
+      }
 
       items.forEach((row, i) => {
         const tr = document.createElement("tr");
@@ -133,44 +119,17 @@
         table.appendChild(tr);
       });
 
-      // Einblenden des Blocks
+      // Bling-Animation
       gsap.fromTo(table,{opacity:0,y:10},{opacity:1,y:0,duration:.8,ease:"power2.out"});
 
-      // Krone nur im Tag-Block
-      if(isDay){
-        const topName = items?.[0]?.name || null;
-        const rankCell = table.querySelector("tr:first-child td.rank");
-        if(rankCell){
-          const crown = ensureCrown(rankCell);
-
-          if(prevDayTopName === null){
-            // Erstes Rendering → keine Animation
-            gsap.set(crown, {opacity:1, y:0, rotate:-18});
-          }else if(topName !== prevDayTopName){
-            // Neuer Platz 1 → Krone fliegt/landet auf die „1“
-            gsap.fromTo(crown,
-              {y:-40, opacity:0, rotate:-40},
-              {y:0, opacity:1, rotate:-18, duration:0.9, ease:"bounce.out"}
-            );
-          }else{
-            // Kein Wechsel → Krone ruhig
-            gsap.set(crown, {opacity:1, y:0, rotate:-18});
-          }
-        }
-        prevDayTopName = topName;
+      // Krone nur bei Tag & nur wenn es einen Platz 1 gibt
+      const crown = document.getElementById("crown");
+      if(isDay && items.length>0){
+        crown.hidden = false;
+        gsap.fromTo(crown,{y:-30,opacity:0,rotate:-40},{y:0,opacity:1,rotate:-20,duration:.8,ease:"bounce.out"});
+      }else{
+        crown.hidden = true;
       }
-    }
-
-    // Krone in die Rank-Zelle setzen (falls nicht vorhanden)
-    function ensureCrown(rankCell){
-      let crown = rankCell.querySelector(".crown");
-      if(!crown){
-        crown = document.createElement("span");
-        crown.className = "crown";
-        crown.textContent = "👑";
-        rankCell.appendChild(crown);
-      }
-      return crown;
     }
 
     loadData();
