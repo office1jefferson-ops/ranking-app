@@ -218,6 +218,18 @@
     // Feste 5 Slots pro Board (starr); wir füllen nur Texte — kein Verrutschen.
     const KEYS = ["day","week","month","year"];
 
+    function formatJE(value) {
+    // Versuchen Zahl daraus zu machen
+    const num = Number(value);
+    if (isNaN(num)) return value; // falls kein Zahl-String
+
+    // Deutsche Formatierung: 1.234,56
+    return num.toLocaleString("de-DE", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+    });
+    }
+    
     function makeEmptyRows(containerId){
       const c = document.getElementById(containerId);
       c.innerHTML = "";
