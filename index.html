@@ -1,24 +1,297 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <title>Ranking RB-INSIDE</title>
-  <link rel="icon" type="image/png" href="favicon.png">
+  <meta charset="utf-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Ranking</title>
   <style>
-    body, html {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      background: #0b0f14;
+    :root{
+      --bg: #0f1115;
+      --panel: #151923;
+      --text: #e9edf1;
+      --muted:#98a2b3;
+      --gold:#D4AF37;
+      --silver:#C0C0C0;
+      --bronze:#CD7F32;
+      --blue: #2ea8ff;
+      --row-h: 56px;   /* feste Zeilenhöhe */
+      --num-w: 64px;   /* Spalte Platz */
+      --name-w: 320px; /* Spalte Name */
+      --je-w: 140px;   /* Spalte JE */
+      --gap: 20px;
+      --radius: 18px;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     }
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
+
+    html, body{
+      height:100%;
+      background: radial-gradient(1200px 1200px at 10% -10%, #1f2636 0%, #0f1115 60%) fixed;
+      color: var(--text);
+      font-family: var(--font);
+      margin:0;
+    }
+
+    .wrap{
+      max-width: 1440px;
+      margin: 40px auto 60px;
+      padding: 0 20px;
+    }
+
+    .title{
+      text-align:center;
+      font-size: clamp(28px, 4vw, 44px);
+      letter-spacing: .5px;
+      margin: 0 0 24px;
+      font-weight: 800;
+      text-shadow: 0 2px 16px rgba(0,0,0,.4);
+    }
+
+    .boards{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--gap);
+    }
+
+    .board{
+      background: linear-gradient(180deg, #171c28 0%, #121723 100%);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px 14px 10px;
+      position: relative;
+      overflow: hidden;
+      min-width: calc(var(--num-w) + var(--name-w) + var(--je-w) + 32px);
+    }
+
+    /* Leuchtende blaue Umrandung NUR beim Tagesranking */
+    .board--day{
+      border: 2px solid rgba(46,168,255,.9);
+      box-shadow:
+        0 0 0 2px rgba(46,168,255,.15) inset,
+        0 0 20px rgba(46,168,255,.35),
+        var(--shadow);
+    }
+
+    .board__head{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .rows{
+      display:flex;
+      flex-direction:column;
+      gap: 8px; /* gleichmäßiger Abstand, stabile Positionen */
+    }
+
+    .row{
+      height: var(--row-h);
+      background: #0e1320;
+      border-radius: 14px;
+      display:grid;
+      grid-template-columns: var(--num-w) var(--name-w) var(--je-w);
+      align-items:center;
+      padding: 0 12px 0 8px;
+      position: relative;
+      overflow: hidden; /* für Krone & Truncation sicher */
+    }
+
+    .row:nth-child(odd){ background: #0c111c; }
+
+    .rank{
+      justify-self: start;
+      width: calc(var(--num-w) - 8px);
+      text-align: center;
+      font-weight: 900;
+      font-size: 20px;
+    }
+
+    .rank--1{ color: var(--gold);   text-shadow: 0 0 10px rgba(212,175,55,.25); }
+    .rank--2{ color: var(--silver); text-shadow: 0 0 10px rgba(192,192,192,.18); }
+    .rank--3{ color: var(--bronze); text-shadow: 0 0 10px rgba(205,127,50,.18); }
+
+    .name{
+      width: var(--name-w);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-weight: 700;
+      font-size: 18px;
+      position: relative;
+      padding-left: 4px; /* Platz für die Krone */
+    }
+
+    /* Krone für Platz 1 – leicht schräg auf dem ersten Buchstaben */
+    .name.crowned::before{
+      content: '';
+      position: absolute;
+      left: 0px; top: -8px;
+      width: 20px; height: 20px;
+      transform: rotate(-12deg);
+      background-repeat: no-repeat;
+      background-size: contain;
+      /* inline SVG (gold) */
+      background-image: url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'>\
+<path fill='%23D4AF37' d='M6 46l6-24 14 12 8-18 12 18 12-12 6 24H6z'/>\
+<rect x='6' y='46' width='52' height='8' rx='3' fill='%23b4891f'/>\
+</svg>");
+      pointer-events: none;
+    }
+
+    .je{
+      width: var(--je-w);
+      justify-self: end;
+      text-align: right;
+      font-family: var(--mono);
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: .02em;
+    }
+
+    .skeleton .row{
+      background: linear-gradient(90deg, #0d1320 25%, #10182a 37%, #0d1320 63%);
+      background-size: 400% 100%;
+      animation: shimmer 1.8s infinite;
+    }
+    @keyframes shimmer{
+      0%{ background-position: 100% 0; }
+      100%{ background-position: -100% 0; }
+    }
+
+    /* Responsiv: bei schmalen Screens 2x2 */
+    @media (max-width: 1100px){
+      .boards{ grid-template-columns: repeat(2, 1fr); }
+    }
+    /* Mobil: untereinander */
+    @media (max-width: 640px){
+      :root{ --name-w: 220px; --je-w: 110px; }
+      .boards{ grid-template-columns: 1fr; }
+      .wrap{ margin: 26px auto 40px; }
     }
   </style>
 </head>
 <body>
-  <iframe src="https://script.google.com/macros/s/AKfycby-oo3Fxp7a3YSUU1kuTYjVYJtm6ypG-ohC6dQT95v2UE9zcRRvUUaPRAMf_1_gd_XB/exec"></iframe>
+  <div class="wrap">
+    <h1 class="title">Ranking</h1>
+
+    <section class="boards">
+      <article class="board board--day"   id="board-day">
+        <div class="board__head">Tag</div>
+        <div class="rows" id="rows-day"></div>
+      </article>
+
+      <article class="board" id="board-week">
+        <div class="board__head">Woche</div>
+        <div class="rows" id="rows-week"></div>
+      </article>
+
+      <article class="board" id="board-month">
+        <div class="board__head">Monat</div>
+        <div class="rows" id="rows-month"></div>
+      </article>
+
+      <article class="board" id="board-year">
+        <div class="board__head">Jahr</div>
+        <div class="rows" id="rows-year"></div>
+      </article>
+    </section>
+  </div>
+
+  <script>
+    // ==== KONFIG ====
+    const ENDPOINT = "https://script.google.com/macros/s/AKfycbx0gxZelxsLaQJnA1nLfyp9k_PiAlptZsPsRrsVDGRwS_yHjCMsDM1ZKA3GBEwdCYi9/exec"; // <— HIER deine Apps-Script Web-App URL eintragen
+    const REFRESH_MS = 60_000;      // jede Minute
+
+    // Feste 5 Slots pro Board (starr); wir füllen nur Texte — kein Verrutschen.
+    const KEYS = ["day","week","month","year"];
+
+    function makeEmptyRows(containerId){
+      const c = document.getElementById(containerId);
+      c.innerHTML = "";
+      for(let i=1;i<=5;i++){
+        const row = document.createElement("div");
+        row.className = "row";
+        row.innerHTML = `
+          <div class="rank ${rankClass(i)}">${i}</div>
+          <div class="name${i===1?' crowned':''}"></div>
+          <div class="je"></div>
+        `;
+        c.appendChild(row);
+      }
+    }
+
+    function rankClass(i){
+      if(i===1) return "rank--1";
+      if(i===2) return "rank--2";
+      if(i===3) return "rank--3";
+      return "";
+    }
+
+    function setSkeleton(on){
+      KEYS.forEach(k=>{
+        const board = document.getElementById("board-"+k);
+        board.classList.toggle("skeleton", !!on);
+      });
+    }
+
+    function renderData(data){
+      KEYS.forEach(k=>{
+        const rows = data[k] || [];
+        const container = document.getElementById("rows-"+k);
+        // Durch genau 5 Slots iterieren
+        [...container.children].forEach((slot, idx)=>{
+          const item = rows[idx];
+          const nameEl = slot.querySelector(".name");
+          const rankEl = slot.querySelector(".rank");
+          const jeEl   = slot.querySelector(".je");
+
+          // Krone nur bei Platz 1 aktiv lassen/entfernen
+          if(idx===0) nameEl.classList.add("crowned"); else nameEl.classList.remove("crowned");
+
+          if(item){
+            rankEl.textContent = item.rank ?? (idx+1);
+            nameEl.textContent = item.name ?? "";
+            jeEl.textContent   = item.je ?? "";
+          }else{
+            // Falls kein Eintrag, Slot bleibt leer aber stabil
+            rankEl.textContent = (idx+1);
+            nameEl.textContent = "";
+            jeEl.textContent   = "";
+          }
+        });
+      });
+    }
+
+    async function loadRanking(){
+      try{
+        setSkeleton(true);
+        const res = await fetch(ENDPOINT, {cache:"no-store"});
+        const json = await res.json();
+        renderData(json);
+      }catch(err){
+        console.error("Ranking fetch error:", err);
+        // Bei Fehler nichts verrücken – einfach Daten so lassen.
+      }finally{
+        setSkeleton(false);
+      }
+    }
+
+    // Initial feste Slots bauen
+    KEYS.forEach(k => makeEmptyRows("rows-"+k));
+    // Erstladung + Intervall
+    loadRanking();
+    setInterval(loadRanking, REFRESH_MS);
+  </script>
 </body>
 </html>
