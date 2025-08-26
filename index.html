@@ -22,11 +22,14 @@
     td.je{text-align:right;font-variant-numeric:tabular-nums}
     .gold{color:gold}.silver{color:silver}.bronze{color:#cd7f32}
 
-    /* Krone wie ein schräger Hut */
-    .crown {
+    /* Krone sitzt auf der Zahl 1 (Rank-Zelle), leicht schräg */
+    .crown{
       position:absolute;
+      top:-8px;               /* feinjustiert für „auf der 1 sitzen“ */
+      left:50%;
+      transform:translate(-50%,-60%) rotate(-18deg);
+      transform-origin:bottom center;
       font-size:1.1rem;
-      transform:rotate(-25deg) translate(-70%,-60%);
       text-shadow:0 0 6px gold,0 0 12px orange;
       pointer-events:none;
     }
@@ -61,6 +64,9 @@
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbx0gxZelxsLaQJnA1nLfyp9k_PiAlptZsPsRrsVDGRwS_yHjCMsDM1ZKA3GBEwdCYi9/exec";
 
+    // Merker für den aktuellen Tag-Platz1 (Name), damit wir nur bei Wechsel animieren
+    let prevDayTopName = null;
+
     function formatJEFromAPI(v){
       const num = parseFloat(String(v).replace(",", "."));
       if (isNaN(num)) return "";
@@ -74,6 +80,7 @@
       try{
         const res = await fetch(API_URL + "?_ts=" + Date.now(), {cache:"no-store"});
         const data = await res.json();
+        // Render
         renderBlock("tag",   data.day,   "err-tag",   true);
         renderBlock("woche", data.week,  "err-woche");
         renderBlock("monat", data.month, "err-monat");
@@ -96,6 +103,7 @@
     function renderBlock(tableId, arr, errId, isDay=false){
       const table = document.getElementById(tableId);
       if(!table) return;
+
       table.innerHTML = "";
       showErr(errId,"");
 
@@ -117,17 +125,6 @@
         const tdName = document.createElement("td");
         tdName.textContent = row?.name ?? "";
 
-        // Krone bei Tag → Platz 1
-        if(isDay && i===0){
-          const crown = document.createElement("span");
-          crown.className = "crown";
-          crown.textContent = "👑";
-          tdName.style.position = "relative";
-          tdName.prepend(crown);
-          // kleine Flug-Animation
-          gsap.fromTo(crown,{y:-30,opacity:0,rotate:-60},{y:0,opacity:1,rotate:-25,duration:.8,ease:"bounce.out"});
-        }
-
         const tdJE = document.createElement("td");
         tdJE.className = "je";
         tdJE.textContent = formatJEFromAPI(row?.je);
@@ -138,12 +135,87 @@
         table.appendChild(tr);
       });
 
-      // Bling-Animation fürs ganze Block-Update
+      // Einblendung des Blocks
       gsap.fromTo(table,{opacity:0,y:10},{opacity:1,y:0,duration:.8,ease:"power2.out"});
+
+      // KRONEN-LOGIK – nur für "Tag"
+      if(isDay){
+        const topName = items?.[0]?.name || null;
+
+        const rankCell = table.querySelector("tr:first-child td.rank");
+        if(rankCell){
+          // vorhandene Krone im Tag-Block finden (falls vorhanden)
+          const existing = rankCell.querySelector(".crown");
+
+          if(prevDayTopName === null){
+            // Erstes Rendering: Krone sichtbar, aber keine „Fall“-Animation
+            ensureCrown(rankCell);
+          }else if(topName !== prevDayTopName){
+            // → Ereignis A: Neuer Platz 1
+            // 1) alte Krone (falls vorhanden) fallen lassen
+            if(existing){ dropCrown(existing); }
+            // 2) neue Krone an die neue „1“ fliegen lassen
+            const newCrown = ensureCrown(rankCell);
+            gsap.fromTo(newCrown,
+              {y:-40, opacity:0, rotate:-50},
+              {y:0, opacity:1, rotate:-18, duration:0.9, ease:"bounce.out"}
+            );
+          }else{
+            // Kein Wechsel: Krone bleibt ruhig (sicherstellen, dass sie da ist)
+            if(!existing) ensureCrown(rankCell);
+          }
+        }
+
+        // Merker aktualisieren
+        prevDayTopName = topName;
+      }
+    }
+
+    // Setzt (oder holt) die Krone in die Rank-Zelle von Platz 1
+    function ensureCrown(rankCell){
+      let crown = rankCell.querySelector(".crown");
+      if(!crown){
+        crown = document.createElement("span");
+        crown.className = "crown";
+        crown.textContent = "👑";
+        rankCell.style.position = "relative"; // Anker
+        rankCell.appendChild(crown);
+      }
+      return crown;
+    }
+
+    // Lässt die vorhandene Krone an Ort und Stelle nach unten fallen + verblassen
+    function dropCrown(crownEl){
+      // Klon in Fixed-Position an exakt gleicher Bildschirm-Position
+      const rect = crownEl.getBoundingClientRect();
+      const clone = crownEl.cloneNode(true);
+      Object.assign(clone.style, {
+        position: "fixed",
+        left: rect.left + "px",
+        top: rect.top + "px",
+        margin: 0,
+        transform: crownEl.style.transform || "translate(-50%,-60%) rotate(-18deg)",
+        zIndex: 9999
+      });
+      document.body.appendChild(clone);
+
+      // Original sofort entfernen (damit keine doppelte Krone hängt)
+      crownEl.remove();
+
+      // Fall + Aufprall + Verblassen
+      gsap.to(clone, {
+        y: 120,
+        rotate: 15,
+        ease: "bounce.out",
+        duration: 1.0,
+        onComplete: () => {
+          gsap.to(clone, {opacity:0, duration:0.4, onComplete:()=> clone.remove()});
+        }
+      });
     }
 
     loadData();
-    setInterval(loadData, 15000);
+    setInterval(loadData, 15000); // Auto-Refresh
   </script>
 </body>
 </html>
