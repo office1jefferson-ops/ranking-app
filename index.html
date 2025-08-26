@@ -9,179 +9,190 @@
   <title>Ranking</title>
   <link rel="icon" type="image/png" href="favicon.png">
   <style>
-    :root{
-      --bg: #0f1115;
-      --panel: #151923;
-      --text: #e9edf1;
-      --muted:#98a2b3;
-      --gold:#D4AF37;
-      --silver:#C0C0C0;
-      --bronze:#CD7F32;
-      --blue: #2ea8ff;
-      --row-h: 56px;   /* feste Zeilenhöhe */
-      --num-w: 64px;   /* Spalte Platz */
-      --name-w: 320px; /* Spalte Name */
-      --je-w: 140px;   /* Spalte JE */
-      --gap: 20px;
-      --radius: 18px;
-      --shadow: 0 10px 30px rgba(0,0,0,.35);
-      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    }
+  :root{
+    --bg: #0f1115;
+    --panel: #151923;
+    --text: #e9edf1;
+    --muted:#98a2b3;
+    --gold:#D4AF37;
+    --silver:#C0C0C0;
+    --bronze:#CD7F32;
+    --blue: #2ea8ff;
+    --row-h: 56px;   /* feste Zeilenhöhe */
+    --num-w: 64px;   /* Spalte Platz */
+    --name-w: 320px; /* Spalte Name */
+    --je-w: 140px;   /* Spalte JE */
+    --gap: 20px;
+    --radius: 18px;
+    --shadow: 0 10px 30px rgba(0,0,0,.35);
+    --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  }
 
-    html, body{
-      height:100%;
-      background: radial-gradient(1200px 1200px at 10% -10%, #1f2636 0%, #0f1115 60%) fixed;
-      color: var(--text);
-      font-family: var(--font);
-      margin:0;
-    }
+  html, body{
+    height:100%;
+    background: radial-gradient(1200px 1200px at 10% -10%, #1f2636 0%, #0f1115 60%) fixed;
+    color: var(--text);
+    font-family: var(--font);
+    margin:0;
+  }
 
-    .wrap{
-      max-width: 1440px;
-      margin: 40px auto 60px;
-      padding: 0 20px;
-    }
+  .wrap{
+    max-width: 1440px;
+    margin: 40px auto 60px;
+    padding: 0 20px;
+  }
 
-    .title{
-      text-align:center;
-      font-size: clamp(28px, 4vw, 44px);
-      letter-spacing: .5px;
-      margin: 0 0 24px;
-      font-weight: 800;
-      text-shadow: 0 2px 16px rgba(0,0,0,.4);
-    }
+  .title{
+    text-align:center;
+    font-size: clamp(28px, 4vw, 44px);
+    letter-spacing: .5px;
+    margin: 0 0 24px;
+    font-weight: 800;
+    text-shadow: 0 2px 16px rgba(0,0,0,.4);
+  }
 
-    .boards{
-      display:grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: var(--gap);
-    }
+  .boards{
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--gap);
+    justify-items: center;   /* mittig in den Grid-Spalten */
+    align-items: start;
+  }
 
-    .board{
-      background: linear-gradient(180deg, #171c28 0%, #121723 100%);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 14px 14px 10px;
-      position: relative;
-      overflow: hidden;
-      min-width: calc(var(--num-w) + var(--name-w) + var(--je-w) + 32px);
-    }
+  .board{
+    background: linear-gradient(180deg, #171c28 0%, #121723 100%);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 14px 14px 10px;
+    position: relative;
+    overflow: hidden;
+    min-width: calc(var(--num-w) + var(--name-w) + var(--je-w) + 32px);
+    width: calc(var(--num-w) + var(--name-w) + var(--je-w) + 32px); /* feste Breite */
+    margin-inline: auto; /* mittig */
+  }
 
-    /* Leuchtende blaue Umrandung NUR beim Tagesranking */
-    .board--day{
-      border: 2px solid rgba(46,168,255,.9);
-      box-shadow:
-        0 0 0 2px rgba(46,168,255,.15) inset,
-        0 0 20px rgba(46,168,255,.35),
-        var(--shadow);
-    }
+  /* Leuchtende blaue Umrandung NUR beim Tagesranking */
+  .board--day{
+    border: 2px solid rgba(46,168,255,.9);
+    box-shadow:
+      0 0 0 2px rgba(46,168,255,.15) inset,
+      0 0 20px rgba(46,168,255,.35),
+      var(--shadow);
+  }
 
-    .board__head{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      margin-bottom: 8px;
-      text-transform: uppercase;
-      letter-spacing: .12em;
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: 700;
-    }
+  .board__head{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 700;
+  }
 
-    .rows{
-      display:flex;
-      flex-direction:column;
-      gap: 8px; /* gleichmäßiger Abstand, stabile Positionen */
-    }
+  .rows{
+    display:flex;
+    flex-direction:column;
+    gap: 8px;
+  }
 
-    .row{
-      height: var(--row-h);
-      background: #0e1320;
-      border-radius: 14px;
-      display:grid;
-      grid-template-columns: var(--num-w) var(--name-w) var(--je-w);
-      align-items:center;
-      padding: 0 12px 0 8px;
-      position: relative;
-      overflow: hidden; /* für Krone & Truncation sicher */
-    }
+  .row{
+    height: var(--row-h);
+    background: #0e1320;
+    border-radius: 14px;
+    display:grid;
+    grid-template-columns: var(--num-w) var(--name-w) var(--je-w);
+    align-items:center;
+    padding: 0 12px 0 8px;
+    position: relative;
+    overflow: hidden;
+  }
 
-    .row:nth-child(odd){ background: #0c111c; }
+  .row:nth-child(odd){ background: #0c111c; }
 
-    .rank{
-      justify-self: start;
-      width: calc(var(--num-w) - 8px);
-      text-align: center;
-      font-weight: 900;
-      font-size: 20px;
-    }
+  .rank{
+    justify-self: start;
+    width: calc(var(--num-w) - 8px);
+    text-align: center;
+    font-weight: 900;
+    font-size: 20px;
+  }
 
-    .rank--1{ color: var(--gold);   text-shadow: 0 0 10px rgba(212,175,55,.25); }
-    .rank--2{ color: var(--silver); text-shadow: 0 0 10px rgba(192,192,192,.18); }
-    .rank--3{ color: var(--bronze); text-shadow: 0 0 10px rgba(205,127,50,.18); }
+  .rank--1{ color: var(--gold);   text-shadow: 0 0 10px rgba(212,175,55,.25); }
+  .rank--2{ color: var(--silver); text-shadow: 0 0 10px rgba(192,192,192,.18); }
+  .rank--3{ color: var(--bronze); text-shadow: 0 0 10px rgba(205,127,50,.18); }
 
-    .name{
-      width: var(--name-w);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      font-weight: 700;
-      font-size: 18px;
-      position: relative;
-      padding-left: 4px; /* Platz für die Krone */
-    }
+  .name{
+    width: var(--name-w);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 700;
+    font-size: 18px;
+    position: relative;
+    padding-left: 4px;
+  }
 
-    /* Krone für Platz 1 – leicht schräg auf dem ersten Buchstaben */
-    .name.crowned::before{
-      content: '';
-      position: absolute;
-      left: 0px; top: -8px;
-      width: 20px; height: 20px;
-      transform: rotate(-12deg);
-      background-repeat: no-repeat;
-      background-size: contain;
-      /* inline SVG (gold) */
-      background-image: url("data:image/svg+xml;utf8,\
+  .name.crowned::before{
+    content: '';
+    position: absolute;
+    left: 0px; top: -8px;
+    width: 20px; height: 20px;
+    transform: rotate(-12deg);
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-image: url("data:image/svg+xml;utf8,\
 <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'>\
 <path fill='%23D4AF37' d='M6 46l6-24 14 12 8-18 12 18 12-12 6 24H6z'/>\
 <rect x='6' y='46' width='52' height='8' rx='3' fill='%23b4891f'/>\
 </svg>");
-      pointer-events: none;
-    }
+    pointer-events: none;
+  }
 
-    .je{
-      width: var(--je-w);
-      justify-self: end;
-      text-align: right;
-      font-family: var(--mono);
-      font-size: 18px;
-      font-weight: 800;
-      letter-spacing: .02em;
-    }
+  .je{
+    width: var(--je-w);
+    justify-self: end;
+    text-align: right;
+    font-family: var(--mono);
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: .02em;
+  }
 
-    .skeleton .row{
-      background: linear-gradient(90deg, #0d1320 25%, #10182a 37%, #0d1320 63%);
-      background-size: 400% 100%;
-      animation: shimmer 1.8s infinite;
-    }
-    @keyframes shimmer{
-      0%{ background-position: 100% 0; }
-      100%{ background-position: -100% 0; }
-    }
+  .skeleton .row{
+    background: linear-gradient(90deg, #0d1320 25%, #10182a 37%, #0d1320 63%);
+    background-size: 400% 100%;
+    animation: shimmer 1.8s infinite;
+  }
+  @keyframes shimmer{
+    0%{ background-position: 100% 0; }
+    100%{ background-position: -100% 0; }
+  }
 
-    /* Responsiv: bei schmalen Screens 2x2 */
-    @media (max-width: 1100px){
-      .boards{ grid-template-columns: repeat(2, 1fr); }
+  /* ===== Responsiv: iPad & Handy untereinander, schön mittig ===== */
+
+  /* iPad & kleiner: EINSPALTIG und mittig */
+  @media (max-width: 1024px){
+    .boards{ grid-template-columns: 1fr; justify-items: center; }
+    .wrap{ margin: 26px auto 40px; }
+  }
+
+  /* Handy: schmalere Spaltenbreiten */
+  @media (max-width: 640px){
+    :root{
+      --name-w: 220px;
+      --je-w: 110px;
+      --num-w: 56px;
+      --row-h: 54px;
     }
-    /* Mobil: untereinander */
-    @media (max-width: 640px){
-      :root{ --name-w: 220px; --je-w: 110px; }
-      .boards{ grid-template-columns: 1fr; }
-      .wrap{ margin: 26px auto 40px; }
-    }
-  </style>
+    .boards{ grid-template-columns: 1fr; }
+  }
+</style>
+
 </head>
 <body>
   <div class="wrap">
