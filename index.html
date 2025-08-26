@@ -276,7 +276,7 @@
           if(item){
             rankEl.textContent = item.rank ?? (idx+1);
             nameEl.textContent = item.name ?? "";
-            jeEl.textContent   = item.je ?? "";
+            jeEl.textContent = formatJE(item.je);
           }else{
             // Falls kein Eintrag, Slot bleibt leer aber stabil
             rankEl.textContent = (idx+1);
