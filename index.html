@@ -53,10 +53,15 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbx0gxZelxsLaQJnA1nLfyp9k_PiAlptZsPsRrsVDGRwS_yHjCMsDM1ZKA3GBEwdCYi9/exec";
 
     function formatJEFromAPI(v){
-      // API liefert z.B. "2.123,22" oder "2.123,22 JE" → wir hängen nur " JE" an, falls nicht vorhanden.
-      const s = String(v ?? "").trim();
-      return s.endsWith("JE") ? s : (s ? s + " JE" : "");
-    }
+  // Zahl sicher umwandeln
+  const num = parseFloat(String(v).replace(",", "."));
+  if (isNaN(num)) return "";
+  return num.toLocaleString("de-DE", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }) + " JE";
+}
+
 
     async function loadData(){
       try{
