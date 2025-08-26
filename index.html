@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta http-equiv="Cache-Control" content="no-store" />
   <title>Ranking</title>
+  <link rel="icon" type="image/png" href="favicon.png" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <style>
     body{
@@ -16,11 +17,20 @@
     .block.tag{border:2px solid #3af;box-shadow:0 0 15px #3af,0 0 30px #08f inset}
     .block h2{margin:0 0 10px;font-size:1.4rem;letter-spacing:1px;text-transform:uppercase;text-shadow:0 0 8px rgba(255,255,255,.5)}
     table{width:100%;border-collapse:collapse;table-layout:fixed}
-    td{padding:6px 8px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    td{padding:6px 8px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative}
     td.rank{width:40px;font-weight:700;text-align:center}
     td.je{text-align:right;font-variant-numeric:tabular-nums}
     .gold{color:gold}.silver{color:silver}.bronze{color:#cd7f32}
-    .crown{position:absolute;font-size:1.2rem;transform:rotate(-20deg);top:43px;left:45px;text-shadow:0 0 6px gold,0 0 12px orange;pointer-events:none}
+
+    /* Krone wie ein schräger Hut */
+    .crown {
+      position:absolute;
+      font-size:1.1rem;
+      transform:rotate(-25deg) translate(-70%,-60%);
+      text-shadow:0 0 6px gold,0 0 12px orange;
+      pointer-events:none;
+    }
+
     .error{opacity:.8;font-size:.9rem;margin-top:6px}
   </style>
 </head>
@@ -28,7 +38,6 @@
   <div class="container">
     <div class="block tag">
       <h2>Tag</h2>
-      <div class="crown" id="crown" aria-hidden="true" hidden>👑</div>
       <table id="tag"></table>
       <div class="error" id="err-tag"></div>
     </div>
@@ -53,28 +62,28 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbx0gxZelxsLaQJnA1nLfyp9k_PiAlptZsPsRrsVDGRwS_yHjCMsDM1ZKA3GBEwdCYi9/exec";
 
     function formatJEFromAPI(v){
-  // Zahl sicher umwandeln
-  const num = parseFloat(String(v).replace(",", "."));
-  if (isNaN(num)) return "";
-  return num.toLocaleString("de-DE", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }) + " JE";
-}
-
+      const num = parseFloat(String(v).replace(",", "."));
+      if (isNaN(num)) return "";
+      return num.toLocaleString("de-DE", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }) + " JE";
+    }
 
     async function loadData(){
       try{
         const res = await fetch(API_URL + "?_ts=" + Date.now(), {cache:"no-store"});
         const data = await res.json();
-        // API-Keys: day, week, month, year  ✅
         renderBlock("tag",   data.day,   "err-tag",   true);
         renderBlock("woche", data.week,  "err-woche");
         renderBlock("monat", data.month, "err-monat");
         renderBlock("jahr",  data.year,  "err-jahr");
       }catch(e){
         console.error(e);
-        showErr("err-tag","API nicht erreichbar");showErr("err-woche","");showErr("err-monat","");showErr("err-jahr","");
+        showErr("err-tag","API nicht erreichbar");
+        showErr("err-woche","");
+        showErr("err-monat","");
+        showErr("err-jahr","");
       }
     }
 
@@ -108,6 +117,17 @@
         const tdName = document.createElement("td");
         tdName.textContent = row?.name ?? "";
 
+        // Krone bei Tag → Platz 1
+        if(isDay && i===0){
+          const crown = document.createElement("span");
+          crown.className = "crown";
+          crown.textContent = "👑";
+          tdName.style.position = "relative";
+          tdName.prepend(crown);
+          // kleine Flug-Animation
+          gsap.fromTo(crown,{y:-30,opacity:0,rotate:-60},{y:0,opacity:1,rotate:-25,duration:.8,ease:"bounce.out"});
+        }
+
         const tdJE = document.createElement("td");
         tdJE.className = "je";
         tdJE.textContent = formatJEFromAPI(row?.je);
@@ -118,21 +138,12 @@
         table.appendChild(tr);
       });
 
-      // Bling-Animation
+      // Bling-Animation fürs ganze Block-Update
       gsap.fromTo(table,{opacity:0,y:10},{opacity:1,y:0,duration:.8,ease:"power2.out"});
-
-      // Krone nur bei Tag & nur wenn es einen Platz 1 gibt
-      const crown = document.getElementById("crown");
-      if(isDay && items.length>0){
-        crown.hidden = false;
-        gsap.fromTo(crown,{y:-30,opacity:0,rotate:-40},{y:0,opacity:1,rotate:-20,duration:.8,ease:"bounce.out"});
-      }else{
-        crown.hidden = true;
-      }
     }
 
     loadData();
-    setInterval(loadData, 15000); // Auto-Refresh
+    setInterval(loadData, 15000);
   </script>
 </body>
 </html>
