@@ -21,10 +21,10 @@
     --silver:#C0C0C0;
     --bronze:#CD7F32;
     --blue: #2ea8ff;
-    --row-h: 56px;
-    --num-w: 64px;
-    --name-w: 320px;
-    --je-w: 140px;
+    --row-h: 56px;   /* feste Zeilenhöhe */
+    --num-w: 64px;   /* Spalte Platz */
+    --name-w: 320px; /* Spalte Name */
+    --je-w: 140px;   /* Spalte JE */
     --gap: 20px;
     --radius: 18px;
     --shadow: 0 10px 30px rgba(0,0,0,.35);
@@ -32,23 +32,18 @@
     --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   }
 
-  html{
-    scrollbar-gutter: stable both-edges; /* gleiche „Reserve“ links & rechts */
-  }
   html, body{
     height:100%;
     background: radial-gradient(1200px 1200px at 10% -10%, #1f2636 0%, #0f1115 60%) fixed;
     color: var(--text);
     font-family: var(--font);
     margin:0;
-    overflow-x: hidden;
   }
 
-  /* ZENTRIERTE HÜLLE mit symmetrischem Innenabstand */
   .wrap{
-    max-width: 1280px;                         /* Gesamtbreite der Inhalte */
-    margin: 40px auto 60px;                    /* zentriert */
-    padding-inline: clamp(16px, 4vw, 32px);    /* gleicher Abstand links/rechts */
+    max-width: 1440px;
+    margin: 40px auto 60px;
+    padding: 0 20px;
   }
 
   .title{
@@ -58,17 +53,13 @@
     margin: 0 0 24px;
     font-weight: 800;
     text-shadow: 0 2px 16px rgba(0,0,0,.4);
-    width: 100%;
   }
 
-  /* GRID nimmt volle Wrap-Breite ein und ist durch margin:auto symmetrisch */
   .boards{
     display:grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: var(--gap);
-    width: 100%;
-    margin: 0 auto; /* zusätzliche Sicherheit für perfekte Zentrierung */
-    justify-items: stretch;
+    justify-items: center;   /* mittig in den Grid-Spalten */
     align-items: start;
   }
 
@@ -79,7 +70,9 @@
     padding: 14px 14px 10px;
     position: relative;
     overflow: hidden;
-    width: 100%;          /* füllt sauber die Grid-Spalte */
+    min-width: calc(var(--num-w) + var(--name-w) + var(--je-w) + 32px);
+    width: calc(var(--num-w) + var(--name-w) + var(--je-w) + 32px); /* feste Breite */
+    margin-inline: auto; /* mittig */
   }
 
   /* Leuchtende blaue Umrandung NUR beim Tagesranking */
@@ -121,6 +114,7 @@
     position: relative;
     overflow: hidden;
   }
+
   .row:nth-child(odd){ background: #0c111c; }
 
   .rank{
@@ -130,6 +124,7 @@
     font-weight: 900;
     font-size: 20px;
   }
+
   .rank--1{ color: var(--gold);   text-shadow: 0 0 10px rgba(212,175,55,.25); }
   .rank--2{ color: var(--silver); text-shadow: 0 0 10px rgba(192,192,192,.18); }
   .rank--3{ color: var(--bronze); text-shadow: 0 0 10px rgba(205,127,50,.18); }
@@ -144,6 +139,7 @@
     position: relative;
     padding-left: 4px;
   }
+
   .name.crowned::before{
     content: '';
     position: absolute;
@@ -180,14 +176,15 @@
     100%{ background-position: -100% 0; }
   }
 
-  /* ===== Responsiv ===== */
+  /* ===== Responsiv: iPad & Handy untereinander, schön mittig ===== */
 
-  /* iPad & kleiner: alles untereinander, trotzdem mittig über Wrap */
+  /* iPad & kleiner: EINSPALTIG und mittig */
   @media (max-width: 1024px){
-    .boards{ grid-template-columns: 1fr; }
+    .boards{ grid-template-columns: 1fr; justify-items: center; }
+    .wrap{ margin: 26px auto 40px; }
   }
 
-  /* Handy: etwas schmalere Spaltenbreiten */
+  /* Handy: schmalere Spaltenbreiten */
   @media (max-width: 640px){
     :root{
       --name-w: 220px;
@@ -195,10 +192,9 @@
       --num-w: 56px;
       --row-h: 54px;
     }
-    .title{ font-size: 28px; }
+    .boards{ grid-template-columns: 1fr; }
   }
 </style>
-
 
 
 
