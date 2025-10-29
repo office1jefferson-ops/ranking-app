@@ -3,24 +3,15 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Rhodenburg – Ranking & Team Challenge</title>
+<title>Rhodenburg AG – Übersicht & Dashboard</title>
 <meta name="color-scheme" content="dark light">
 <style>
   :root{
-    --bg:#0b0f17;
-    --bg-2:#0f1522;
-    --panel:#121a2a;
-    --text:#e9f1ff;
-    --muted:#9fb3d9;
-    --accent:#59a6ff;
-    --accent-2:#9ad1ff;
-    --gold:#ffcc4d;
-    --silver:#c7d2e1;
-    --bronze:#d7a476;
-    --steel:#7f8aa9;
-    --danger:#ff4d6d;
-    --ok:#3ddc97;
-    --glow: 0 0 22px rgba(89,166,255,.35);
+    --bg:#0b0f17; --bg-2:#0f1522; --panel:#121a2a;
+    --text:#e9f1ff; --muted:#9fb3d9;
+    --accent:#59a6ff; --accent-2:#9ad1ff;
+    --gold:#ffcc4d; --silver:#c7d2e1; --bronze:#d7a476; --steel:#7f8aa9;
+    --danger:#ff4d6d; --ok:#3ddc97; --glow: 0 0 22px rgba(89,166,255,.35);
   }
   *{box-sizing:border-box}
   html,body{height:100%}
@@ -28,46 +19,114 @@
     margin:0; background: radial-gradient(1200px 800px at 70% 10%, #14203a 0%, var(--bg) 55%) no-repeat fixed; 
     color:var(--text); font:500 16px/1.4 system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
   }
+
+  /* ====== LAYOUT ====== */
   .app{
-    height:100vh; display:grid; grid-template-columns: 320px 1fr; grid-template-rows:auto 1fr;
+    height:100vh; display:grid; gap:16px; padding:16px;
+    grid-template-columns: 1fr;
+    grid-template-rows:auto auto 1fr auto;
     grid-template-areas:
-      "header header"
-      "left   main";
-    gap:16px; padding:16px;
+      "header"
+      "challenge"
+      "ranks"
+      "race";
   }
   header{
     grid-area:header; display:flex; align-items:center; justify-content:space-between;
-    padding:12px 16px; background:linear-gradient(180deg, #152037, #0f1627); border:1px solid #22365e; border-radius:16px;
-    box-shadow: var(--glow); position:relative; overflow:hidden;
+    padding:12px 16px; background:linear-gradient(180deg, #152037, #0f1627);
+    border:1px solid #22365e; border-radius:16px; box-shadow: var(--glow);
   }
-  header .title{font-weight:700; letter-spacing:.4px}
-  header .title small{display:block; color:var(--muted); font-weight:500; letter-spacing:0}
-  header .right{display:flex; gap:12px; align-items:center}
-  select, button, input[type=password]{
+  header .title{font-weight:700; letter-spacing:.3px}
+  header .title small{display:block; color:var(--muted); font-weight:500}
+  .controls{display:flex; gap:12px; align-items:center}
+  .seg{display:inline-flex; background:#0e1628; border:1px solid #2a4273; border-radius:999px; padding:3px}
+  .seg button{border:none; background:transparent; padding:8px 10px; color:var(--muted); border-radius:999px}
+  .seg button.active{background:#1a2a4b; color:var(--text); box-shadow:var(--glow)}
+
+  /* Selector pill centered content */
+  .pill{display:flex; align-items:center; justify-content:center; gap:10px;
+    min-width:260px; padding:8px 12px; border:1px solid #2a4273; border-radius:999px; background:#0e1628; color:var(--muted); font-weight:700}
+  .pill span{letter-spacing:.2px}
+  .pill select{
     appearance:none; border:1px solid #2a4273; background:#0e1628; color:var(--text);
-    padding:10px 12px; border-radius:12px; font-weight:600;
+    padding:8px 10px; border-radius:10px; font-weight:700; min-width:160px; text-align:center;
   }
-  button.primary{background:linear-gradient(180deg,#2b6aff,#1f56d6); border-color:#2e4f99; box-shadow:var(--glow)}
-  button.ghost{background:transparent}
-  .pill{padding:8px 12px; border:1px solid #2a4273; border-radius:999px; color:var(--muted)}
-  .left{
-    grid-area:left; display:flex; flex-direction:column; gap:16px;
+
+  /* Panels */
+  .panel{
+    background:linear-gradient(180deg, #0f182a, #0a1120);
+    border:1px solid #22365e; border-radius:20px; padding:20px; box-shadow:var(--glow);
   }
-  .card{
-    background:linear-gradient(180deg, var(--panel), #0e1627);
-    border:1px solid #22365e; border-radius:16px; padding:14px; box-shadow: var(--glow);
-    position:relative; overflow:hidden;
+
+  /* ====== CHALLENGE BLOCK ====== */
+  .challenge-grid{
+    grid-area:challenge;
+    display:grid; gap:16px;
+    grid-template-columns: 1.1fr .9fr;
   }
+  .hero{
+    display:grid; grid-template-columns: 200px 1fr; gap:20px; align-items:center;
+  }
+  .ring{position:relative; width:200px; height:200px}
+  .ring svg{width:200px;height:200px;transform:rotate(-90deg)}
+  .ring .center{position:absolute; inset:0; display:grid; place-items:center; text-align:center}
+  .ring .big{font-weight:800; font-size:34px}
+  .ring .small{color:var(--muted); font-size:13px}
+  .stats{display:grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap:12px}
+  .stat{padding:12px 14px; border:1px solid #22365e; border-radius:14px; background:#0b1324;
+        display:flex; justify-content:space-between; align-items:center; gap:8px}
+  .stat .val{font-weight:800; font-size:18px}
+  .badge{padding:6px 10px; border-radius:999px; background:#112044; border:1px solid #244179; color:var(--accent-2); font-weight:700; font-size:12px}
+
+  /* Day challenge progress (milestones) */
+  .milestones{margin-top:14px}
+  .bar{
+    position:relative; height:16px; border-radius:999px;
+    background:linear-gradient(180deg, #0c1323, #0a1120); border:1px solid #22365e; overflow:hidden;
+  }
+  .bar .fill{
+    position:absolute; inset:0; width:0%;
+    background:linear-gradient(90deg, rgba(89,166,255,.55), rgba(154,209,255,.9));
+    box-shadow: 0 0 20px rgba(154,209,255,.45);
+    transition:width .6s cubic-bezier(.2,.8,.2,1);
+  }
+  .ticks{position:relative; height:0; margin-top:6px}
+  .tick{position:absolute; top:-6px; width:2px; height:28px; background:#29436f; border-radius:2px}
+  .tick label{position:absolute; top:30px; transform:translateX(-50%); color:var(--muted); font-size:12px}
+  .liveRow{display:flex; align-items:center; gap:10px; margin-top:10px}
+  .liveTag{background:#e33; color:#fff; font-weight:900; padding:4px 8px; border-radius:8px; letter-spacing:.5px; box-shadow:0 0 12px rgba(255,77,109,.45)}
+  .liveVal{display:flex; align-items:center; gap:8px; font-weight:900; font-size:20px}
+
+  /* Week challenge flashy bar */
+  .flash{
+    position:relative; height:20px; border-radius:999px; overflow:hidden;
+    background:#0a1222; border:1px solid #234171;
+  }
+  .flash .glow{
+    position:absolute; inset:0; width:0%;
+    background:linear-gradient(90deg, rgba(50,120,255,.25), rgba(120,190,255,.8), rgba(50,120,255,.25));
+    filter: drop-shadow(0 0 20px rgba(120,190,255,.6));
+    transition:width .8s cubic-bezier(.2,.8,.2,1);
+  }
+  .flash::after{
+    /* shimmer */
+    content:""; position:absolute; inset:0; width:120px; transform:translateX(-140%);
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent);
+    animation: shimmer 3s linear infinite;
+    pointer-events:none;
+  }
+  @keyframes shimmer { 100% { transform:translateX(220%);} }
+
+  /* ====== RANKINGS (breit) ====== */
+  .ranks{grid-area:ranks; display:grid; gap:16px; grid-template-columns: 1fr 1fr;}
+  .card{background:linear-gradient(180deg, var(--panel), #0e1627); border:1px solid #22365e; border-radius:16px; padding:14px; box-shadow:var(--glow)}
   .card h3{margin:0 0 8px 0; font-size:15px; letter-spacing:.3px; color:var(--muted)}
-  .rank-list{display:flex; flex-direction:column; gap:10px; margin-top:6px; max-height:62vh; overflow:auto; padding-right:6px}
+  .rank-list{display:flex; flex-direction:column; gap:10px; margin-top:6px; max-height:44vh; overflow:auto; padding-right:6px}
   .rank{
     display:grid; grid-template-columns: 44px 1fr auto; align-items:center; gap:10px;
     padding:10px; border:1px solid #23385f; border-radius:12px; background:#0d1423cc; backdrop-filter: blur(4px);
   }
-  .rank .medal{
-    width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-weight:800;color:#081018;
-    box-shadow: inset 0 0 10px rgba(0,0,0,.35);
-  }
+  .rank .medal{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-weight:800;color:#081018; box-shadow: inset 0 0 10px rgba(0,0,0,.35)}
   .rank .name{font-weight:700}
   .rank .stars{display:flex; align-items:center; gap:8px; font-feature-settings:"tnum"; font-variant-numeric:tabular-nums}
   .sstar{width:16px;height:16px;filter: drop-shadow(0 0 6px rgba(106,182,255,.8))}
@@ -75,77 +134,45 @@
   .silver{background:linear-gradient(180deg, #e3edf8, var(--silver)); border:1px solid #7a8796}
   .bronze{background:linear-gradient(180deg, #ffd3b0, var(--bronze)); border:1px solid #9a6d42}
   .steel{background:linear-gradient(180deg, #99a6c5, var(--steel)); border:1px solid #586178}
-  .main{
-    grid-area:main; display:grid; grid-template-columns: 1fr; grid-template-rows:1fr; min-height:0;
-  }
-  .challenge{
-    position:relative; display:grid; grid-template-columns: 1.2fr .8fr; gap:16px; align-items:stretch;
-  }
-  .panel{
-    background:linear-gradient(180deg, #0f182a, #0a1120); border:1px solid #22365e; border-radius:20px; padding:24px; box-shadow:var(--glow);
-  }
-  .hero{
-    display:grid; grid-template-columns: 200px 1fr; gap:24px; align-items:center;
-  }
-  .ring{
-    position:relative; width:200px; height:200px;
-  }
-  .ring svg{width:200px;height:200px;transform:rotate(-90deg)}
-  .ring .center{
-    position:absolute; inset:0; display:grid; place-items:center; text-align:center;
-  }
-  .ring .big{font-weight:800; font-size:34px; letter-spacing:.4px}
-  .ring .small{color:var(--muted); font-size:13px}
-  .stats{display:grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap:12px}
-  .stat{
-    padding:12px 14px; border:1px solid #22365e; border-radius:14px; background:#0b1324;
-    display:flex; justify-content:space-between; align-items:center; gap:8px;
-  }
-  .stat .val{font-weight:800; font-size:18px}
-  .badge{padding:6px 10px; border-radius:999px; background:#112044; border:1px solid #244179; color:var(--accent-2); font-weight:700; font-size:12px}
-  .lanes{margin-top:18px; display:flex; flex-direction:column; gap:10px}
+
+  /* ====== RACE VIEW ====== */
+  .race{grid-area:race}
+  .lanes{display:flex; flex-direction:column; gap:10px}
   .lane{position:relative; height:44px; border:1px dashed #2a4273; border-radius:999px; overflow:hidden; background:linear-gradient(90deg,#0b1324,rgba(26,54,105,.35))}
-  .runner{
-    position:absolute; top:2px; left:2px; height:40px; aspect-ratio:1; border-radius:50%; background:radial-gradient(circle at 35% 35%, #9ad1ff, #2f79d6);
-    box-shadow:0 0 16px rgba(89,166,255,.9), 0 0 36px rgba(89,166,255,.35) inset;
-    display:grid; place-items:center; font-weight:900; color:#071021
-  }
-  .trail{
-    position:absolute; top:0; left:0; bottom:0; background:linear-gradient(90deg, rgba(89,166,255,.35), rgba(89,166,255,0));
-    pointer-events:none;
-  }
-  .lane .label{
-    position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--muted); font-weight:700
-  }
-  .lane .pct{
-    position:absolute; right:12px; top:50%; transform:translateY(-50%); font-weight:800
-  }
-  .controls{display:flex; align-items:center; gap:12px; justify-content:flex-end}
-  .controls .seg{display:inline-flex; background:#0e1628; border:1px solid #2a4273; border-radius:999px; padding:3px}
-  .controls .seg button{border:none; background:transparent; padding:8px 10px; color:var(--muted); border-radius:999px}
-  .controls .seg button.active{background:#1a2a4b; color:var(--text); box-shadow:var(--glow)}
-  /* Password overlays */
-  .overlay{
-    position:fixed; inset:0; display:grid; place-items:center; background:linear-gradient(180deg, rgba(9,12,20,.88), rgba(9,12,20,.92)); z-index:50;
-  }
-  .auth-box{
-    width:min(420px,92vw); background:linear-gradient(180deg,#0e1628,#0a1120);
-    border:1px solid #2a4273; border-radius:16px; padding:18px; box-shadow:var(--glow);
-    display:grid; gap:12px;
-  }
+  .runner{position:absolute; top:2px; left:2px; height:40px; aspect-ratio:1; border-radius:50%; background:radial-gradient(circle at 35% 35%, #9ad1ff, #2f79d6);
+    box-shadow:0 0 16px rgba(89,166,255,.9), 0 0 36px rgba(89,166,255,.35) inset; display:grid; place-items:center; font-weight:900; color:#071021}
+  .trail{position:absolute; top:0; left:0; bottom:0; background:linear-gradient(90deg, rgba(89,166,255,.35), rgba(89,166,255,0)); pointer-events:none;}
+  .lane .label{position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--muted); font-weight:700}
+  .lane .pct{position:absolute; right:12px; top:50%; transform:translateY(-50%); font-weight:800}
+
+  /* ====== PASSWORD OVERLAYS ====== */
+  .overlay{position:fixed; inset:0; display:grid; place-items:center; background:linear-gradient(180deg, rgba(9,12,20,.88), rgba(9,12,20,.92)); z-index:50;}
+  .auth-box{width:min(420px,92vw); background:linear-gradient(180deg,#0e1628,#0a1120); border:1px solid #2a4273; border-radius:16px; padding:18px; box-shadow:var(--glow); display:grid; gap:12px;}
   .auth-box h2{margin:0 0 6px 0}
   .row{display:flex; gap:8px}
   .hint{color:var(--muted); font-size:13px}
   .hidden{display:none !important}
-  /* Scrollbars */
-  ::-webkit-scrollbar{width:10px;height:10px}
-  ::-webkit-scrollbar-thumb{background:#1f2b46;border-radius:10px;border:2px solid #0b0f17}
-  /* Small screens */
-  @media (max-width: 1000px){
-    .app{grid-template-columns:1fr; grid-template-rows:auto auto 1fr; grid-template-areas:"header" "left" "main"}
-    .left{flex-direction:row}
-    .rank-list{max-height:40vh}
-    .challenge{grid-template-columns:1fr}
+
+  /* ====== RESPONSIVE (iPad & Co.) ====== */
+  @media (max-width: 1200px){
+    .challenge-grid{grid-template-columns: 1fr}
+    .hero{grid-template-columns: 160px 1fr}
+    .ring{width:160px;height:160px}
+    .ring svg{width:160px;height:160px}
+  }
+  @media (max-width: 1024px){ /* iPad */
+    .app{
+      grid-template-rows:auto auto auto auto;
+      grid-template-areas:
+        "header"
+        "challenge"
+        "ranks"
+        "race";
+    }
+    .rank-list{max-height:38vh}
+  }
+  @media (max-width: 850px){
+    .ranks{grid-template-columns: 1fr}
   }
 </style>
 </head>
@@ -156,7 +183,7 @@
     <p class="hint">Bitte Passwort eingeben (automatisch 24h angemeldet).</p>
     <div class="row">
       <input id="sitePw" type="password" placeholder="Passwort" style="flex:1" />
-      <button id="siteLogin" class="primary">Anmelden</button>
+      <button id="siteLogin" class="seg active">Anmelden</button>
     </div>
   </div>
 </div>
@@ -165,29 +192,99 @@
   <header>
     <div class="title">
       <div style="display:flex; align-items:center; gap:10px;">
-        <span class="badge">Rhodenburg CRM</span>
-        <strong>Team Challenge & Ranking</strong>
+        <span class="badge">Rhodenburg AG</span>
+        <strong>Übersicht &amp; Dashboard</strong>
       </div>
       <small id="updatedAt">Aktualisiert: –</small>
     </div>
-    <div class="right">
-      <div class="controls">
-        <div class="seg" role="tablist" aria-label="Darstellung">
-          <button id="viewStats" class="active" aria-selected="true">Zahlen</button>
-          <button id="viewRace" aria-selected="false">Pferderennen</button>
-        </div>
+    <div class="controls">
+      <div class="seg" role="tablist" aria-label="Darstellung">
+        <button id="viewStats" class="active" aria-selected="true">Zahlen</button>
+        <button id="viewRace" aria-selected="false">Pferderennen</button>
       </div>
-      <label class="pill">Challenge:
-        <select id="challengeSelect" style="margin-left:8px"></select>
+      <label class="pill">
+        <span>Challenge</span>
+        <select id="challengeSelect"></select>
       </label>
     </div>
   </header>
 
-  <aside class="left">
+  <!-- CHALLENGE -->
+  <section class="challenge-grid">
+    <div class="panel">
+      <div class="hero">
+        <!-- Week Ring -->
+        <div class="ring">
+          <svg viewBox="0 0 120 120" aria-hidden="true">
+            <defs>
+              <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#59a6ff"/>
+                <stop offset="100%" stop-color="#9ad1ff"/>
+              </linearGradient>
+            </defs>
+            <circle cx="60" cy="60" r="52" stroke="#1a2a4b" stroke-width="12" fill="none"/>
+            <circle id="ringProgress" cx="60" cy="60" r="52" stroke="url(#grad)" stroke-width="12" fill="none" stroke-linecap="round" stroke-dasharray="326.73" stroke-dashoffset="326.73"/>
+          </svg>
+          <div class="center">
+            <div class="big" id="weekPct">0,00%</div>
+            <div class="small">Wochenfortschritt</div>
+          </div>
+        </div>
+
+        <!-- Info / Stats -->
+        <div>
+          <h2 id="challengeTitle" style="margin:0 0 6px 0; letter-spacing:.3px">Team Challenge</h2>
+          <div class="stats" aria-live="polite">
+            <div class="stat">
+              <div><div style="color:var(--muted);font-size:12px">Wochenziel (STARS)</div><div class="val" id="weekGoal">0,00</div></div>
+            </div>
+            <div class="stat">
+              <div><div style="color:var(--muted);font-size:12px">Woche IST (STARS)</div><div class="val" id="weekIst">0,00</div></div>
+            </div>
+            <div class="stat">
+              <div><div style="color:var(--muted);font-size:12px">Tagesziel (STARS)</div><div class="val" id="dayGoal">0,00</div></div>
+              <span class="badge">auto</span>
+            </div>
+            <div class="stat">
+              <div><div style="color:var(--muted);font-size:12px">Heute IST (STARS)</div><div class="val" id="dayIst">0,00</div></div>
+              <span class="badge" id="dayPct">0,00%</span>
+            </div>
+          </div>
+
+          <!-- Day milestones -->
+          <div class="milestones">
+            <div style="margin-bottom:6px; color:var(--muted); font-weight:700;">Tages-Challenge</div>
+            <div class="bar"><div class="fill" id="dayFill"></div></div>
+            <div class="ticks" id="dayTicks"></div>
+            <div class="liveRow">
+              <span class="liveTag">LIVE</span>
+              <span class="liveVal"><span id="liveStars">0</span><img class="sstar" alt="Stern" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='%239ad1ff' viewBox='0 0 24 24'><path d='M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.2l7.1-.6z'/></svg>"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Flashy week bar -->
+    <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <h3 style="margin:0;color:var(--muted)">Wochen-Challenge (Flash-Bar)</h3>
+        <span class="badge">progress live</span>
+      </div>
+      <div class="flash"><div class="glow" id="weekGlow"></div></div>
+      <div style="display:flex; justify-content:space-between; margin-top:8px; font-weight:800;">
+        <div><span id="weekPctText">0,00%</span></div>
+        <div><span id="weekIstCompact">0</span> <img class="sstar" alt="Stern" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='%2359a6ff' viewBox='0 0 24 24'><path d='M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.2l7.1-.6z'/></svg>"> / <span id="weekGoalCompact">0</span> <img class="sstar" alt="Stern" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='%239ad1ff' viewBox='0 0 24 24'><path d='M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.2l7.1-.6z'/></svg>"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RANKINGS (breit) -->
+  <section class="ranks">
     <section class="card" id="dayCard">
       <div style="display:flex;align-items:center; justify-content:space-between;">
         <h3>Tagesranking</h3>
-        <button class="ghost" id="dayUnlock">🔒</button>
+        <button class="seg" id="dayUnlock">🔒</button>
       </div>
       <div id="dayProtected" class="hint">Dieser Bereich ist geschützt.</div>
       <div class="rank-list hidden" id="dayList"></div>
@@ -195,66 +292,21 @@
     <section class="card" id="weekCard">
       <div style="display:flex;align-items:center; justify-content:space-between;">
         <h3>Wochenranking</h3>
-        <button class="ghost" id="weekUnlock">🔒</button>
+        <button class="seg" id="weekUnlock">🔒</button>
       </div>
       <div id="weekProtected" class="hint">Dieser Bereich ist geschützt.</div>
       <div class="rank-list hidden" id="weekList"></div>
     </section>
-  </aside>
+  </section>
 
-  <main class="main">
-    <section class="challenge">
-      <div class="panel">
-        <div class="hero">
-          <div class="ring">
-            <svg viewBox="0 0 120 120" aria-hidden="true">
-              <defs>
-                <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stop-color="#59a6ff"/>
-                  <stop offset="100%" stop-color="#9ad1ff"/>
-                </linearGradient>
-              </defs>
-              <circle cx="60" cy="60" r="52" stroke="#1a2a4b" stroke-width="12" fill="none"/>
-              <circle id="ringProgress" cx="60" cy="60" r="52" stroke="url(#grad)" stroke-width="12" fill="none" stroke-linecap="round" stroke-dasharray="326.73" stroke-dashoffset="326.73"/>
-            </svg>
-            <div class="center">
-              <div class="big" id="weekPct">0,00%</div>
-              <div class="small">Wochenfortschritt</div>
-            </div>
-          </div>
-          <div>
-            <h2 id="challengeTitle" style="margin:0 0 6px 0; letter-spacing:.3px"></h2>
-            <div class="stats" aria-live="polite">
-              <div class="stat">
-                <div><div style="color:var(--muted);font-size:12px">Wochenziel (STARS)</div><div class="val" id="weekGoal">0,00</div></div>
-                <img class="sstar" alt="Stern" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='%2359a6ff' viewBox='0 0 24 24'><path d='M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.2l7.1-.6z'/></svg>">
-              </div>
-              <div class="stat">
-                <div><div style="color:var(--muted);font-size:12px">Woche IST (STARS)</div><div class="val" id="weekIst">0,00</div></div>
-                <img class="sstar" alt="Stern" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='%239ad1ff' viewBox='0 0 24 24'><path d='M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.2l7.1-.6z'/></svg>">
-              </div>
-              <div class="stat">
-                <div><div style="color:var(--muted);font-size:12px">Tagesziel (STARS)</div><div class="val" id="dayGoal">0,00</div></div>
-                <span class="badge">auto</span>
-              </div>
-              <div class="stat">
-                <div><div style="color:var(--muted);font-size:12px">Heute IST (STARS)</div><div class="val" id="dayIst">0,00</div></div>
-                <span class="badge" id="dayPct">0,00%</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel" id="racePanel" aria-hidden="true">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-          <h3 style="margin:0;color:var(--muted)">Pferderennen Ansicht</h3>
-          <span class="badge">Fortschritt live</span>
-        </div>
-        <div class="lanes" id="lanes"></div>
-      </div>
-    </section>
-  </main>
+  <!-- RACE VIEW -->
+  <section class="panel race" id="racePanel" style="display:none" aria-hidden="true">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <h3 style="margin:0;color:var(--muted)">Pferderennen Ansicht</h3>
+      <span class="badge">Fortschritt live</span>
+    </div>
+    <div class="lanes" id="lanes"></div>
+  </section>
 </div>
 
 <!-- Secondary overlay for ranking-area password -->
@@ -264,38 +316,30 @@
     <p class="hint">Passwort für Ranking-Bereiche (24h gültig).</p>
     <div class="row">
       <input id="areaPw" type="password" placeholder="Passwort für Rankings" style="flex:1" />
-      <button id="areaLogin" class="primary">Freischalten</button>
-      <button id="areaCancel">Abbrechen</button>
+      <button id="areaLogin" class="seg active">Freischalten</button>
+      <button id="areaCancel" class="seg">Abbrechen</button>
     </div>
   </div>
 </div>
 
 <script>
-/* =========================
-   CONFIG
-   ========================= */
-const API_URL = "https://script.google.com/macros/s/AKfycbyZUilkl_0BGNzUu3UsJ8U1H75ZCWpcbF08UTYJKmbxLHQZH8T23OCOaUiykZ5Ft41ZGA/exec"; // <- setze deine Apps Script Web App URL
-const POLL_MS = 60000; // 60s
+/* ========== CONFIG ========= */
+const API_URL = "https://script.google.com/macros/s/AKfycbyZUilkl_0BGNzUu3UsJ8U1H75ZCWpcbF08UTYJKmbxLHQZH8T23OCOaUiykZ5Ft41ZGA/exec"; // <- deine Apps Script Web App URL
+const POLL_MS = 60000;
 const SITE_PW = "Rhodenburg";
 const AREA_PW = "Rhodenburg1234";
 const DAY_MS = 24*60*60*1000;
 
-/* =========================
-   AUTH (localStorage, 24h)
-   ========================= */
+/* ========== AUTH ========= */
 const keySite = "rb_auth_site";
 const keyArea = "rb_auth_area";
 const nowTs = () => Date.now();
-
 function isAuthed(k){ try{ const raw=localStorage.getItem(k); if(!raw) return false; const o=JSON.parse(raw); return (nowTs()-o.ts) < DAY_MS; }catch{ return false; } }
 function setAuthed(k){ localStorage.setItem(k, JSON.stringify({ ts: nowTs() })); }
-
 function show(el){ el.classList.remove("hidden"); }
 function hide(el){ el.classList.add("hidden"); }
 
-/* =========================
-   FETCH (JSON + JSONP Fallback)
-   ========================= */
+/* ========== FETCH ========= */
 async function fetchData(){
   try{
     const r = await fetch(API_URL, { cache:"no-store" });
@@ -316,70 +360,38 @@ async function fetchData(){
   }
 }
 
-/* =========================
-   FORMAT / TWEEN
-   ========================= */
+/* ========== FORMAT / TWEEN ========= */
 const fmtDE = (n, frac=2) => new Intl.NumberFormat("de-DE", { minimumFractionDigits: frac, maximumFractionDigits: frac }).format(Number(n||0));
+const fmtInt = (n) => new Intl.NumberFormat("de-DE", { maximumFractionDigits: 0 }).format(Number(n||0));
 function tweenNumber(el, to, dur=650){
   const from = Number(el._val || 0);
-  const start = performance.now();
-  const diff = to - from;
-  function frame(t){
-    const p = Math.min(1, (t - start)/dur);
-    const eased = 1 - Math.pow(1-p, 3); // easeOutCubic
-    const cur = from + diff*eased;
-    el.textContent = fmtDE(cur);
-    el._val = cur;
-    if(p<1) requestAnimationFrame(frame);
-  }
+  const start = performance.now(); const diff = to - from;
+  function frame(t){ const p=Math.min(1,(t-start)/dur); const e=1-Math.pow(1-p,3); const cur=from+diff*e;
+    el.textContent = fmtDE(cur); el._val=cur; if(p<1) requestAnimationFrame(frame); }
   requestAnimationFrame(frame);
 }
 function tweenPercent(el, to, dur=650){
   const from = Number(el._val || 0);
-  const start = performance.now();
-  const diff = to - from;
-  function frame(t){
-    const p = Math.min(1, (t - start)/dur);
-    const eased = 1 - Math.pow(1-p, 3);
-    const cur = from + diff*eased;
-    el.textContent = fmtDE(cur) + "%";
-    el._val = cur;
-    if(p<1) requestAnimationFrame(frame);
-  }
+  const start = performance.now(); const diff = to - from;
+  function frame(t){ const p=Math.min(1,(t-start)/dur); const e=1-Math.pow(1-p,3); const cur=from+diff*e;
+    el.textContent = fmtDE(cur) + "%"; el._val=cur; if(p<1) requestAnimationFrame(frame); }
   requestAnimationFrame(frame);
 }
 function tweenRing(circle, toPct, dur=800){
-  const C = 2*Math.PI*52; // circumference (r=52)
-  const fromPct = Number(circle._pct || 0);
+  const C = 2*Math.PI*52; const fromPct = Number(circle._pct || 0);
   const start = performance.now();
-  function frame(t){
-    const p = Math.min(1, (t - start)/dur);
-    const eased = 1 - Math.pow(1-p, 3);
-    const curPct = fromPct + (toPct - fromPct)*eased;
-    const off = C * (1 - Math.max(0, Math.min(1, curPct/100)));
-    circle.style.strokeDashoffset = off;
-    circle._pct = curPct;
-    if(p<1) requestAnimationFrame(frame);
-  }
+  function frame(t){ const p=Math.min(1,(t-start)/dur); const e=1-Math.pow(1-p,3);
+    const curPct = fromPct + (toPct - fromPct)*e; const off = C * (1 - Math.max(0, Math.min(1, curPct/100)));
+    circle.style.strokeDashoffset = off; circle._pct = curPct; if(p<1) requestAnimationFrame(frame); }
   requestAnimationFrame(frame);
 }
 
-/* =========================
-   UI BUILDERS
-   ========================= */
-function starSVG(size=16, color="%2359a6ff"){
-  return `data:image/svg+xml;utf8,` +
-    `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='${size}' height='${size}' fill='${color}'>` +
-    `<path d='M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.2l7.1-.6z'/></svg>`;
+/* ========== UI HELPERS ========= */
+function medalClass(i){ return i===0 ? "gold" : i===1 ? "silver" : i===2 ? "bronze" : "steel"; }
+function starImg(size=16, color="%239ad1ff"){
+  return "data:image/svg+xml;utf8," +
+    "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='"+size+"' height='"+size+"' fill='"+color+"'><path d='M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.2l7.1-.6z'/></svg>";
 }
-
-function medalClass(i){
-  if(i===0) return "gold";
-  if(i===1) return "silver";
-  if(i===2) return "bronze";
-  return "steel";
-}
-
 function buildRankList(container, items){
   container.innerHTML = "";
   items.forEach((it, i)=>{
@@ -389,13 +401,12 @@ function buildRankList(container, items){
       <div class="medal ${medalClass(i)}">${i+1}</div>
       <div class="name">${it.name}</div>
       <div class="stars">
-        <img class="sstar" alt="Stern" src="${starSVG(16, '%239ad1ff')}"/>
-        <strong>${fmtDE(it.stars, 0)} STARS</strong>
+        <strong>${fmtInt(it.stars)}</strong>
+        <img class="sstar" alt="★" src="${starImg(16, '%2359a6ff')}"/>
       </div>`;
     container.appendChild(row);
   });
 }
-
 function buildLanes(container, challenges){
   container.innerHTML = "";
   challenges.forEach((ch, idx)=>{
@@ -410,22 +421,28 @@ function buildLanes(container, challenges){
     container.appendChild(lane);
   });
 }
+function buildDayTicks(goal){
+  const ticksEl = document.getElementById("dayTicks");
+  ticksEl.innerHTML = "";
+  const ms = [0,25,50,75,100];
+  ms.forEach(p=>{
+    const d = document.createElement("div"); d.className="tick";
+    d.style.left = p+"%";
+    d.innerHTML = `<label>${p}%</label>`;
+    ticksEl.appendChild(d);
+  });
+}
 
-/* =========================
-   STATE
-   ========================= */
+/* ========== STATE ========= */
 let lastPayload = null;
 let currentChallengeIndex = 0;
 
-/* =========================
-   UPDATE UI
-   ========================= */
+/* ========== UPDATE ========= */
 function updateUI(payload){
-  // Timestamp
   document.getElementById("updatedAt").textContent =
     "Aktualisiert: " + new Date(payload.updatedAt || Date.now()).toLocaleString("de-DE");
 
-  // Challenge selector
+  // selector
   const sel = document.getElementById("challengeSelect");
   const wasEmpty = sel.options.length === 0;
   sel.innerHTML = "";
@@ -446,7 +463,7 @@ function updateUI(payload){
     document.getElementById("lanes").innerHTML = "";
   }
 
-  // Rankings (only visible if area unlocked)
+  // Rankings (visible only if area unlocked)
   if (isAuthed(keyArea)){
     buildRankList(document.getElementById("dayList"), payload.day || []);
     buildRankList(document.getElementById("weekList"), payload.week || []);
@@ -465,42 +482,66 @@ function renderChallenge(ch){
   const dayPct   = document.getElementById("dayPct");
   const ring     = document.getElementById("ringProgress");
 
+  const weekGlow = document.getElementById("weekGlow");
+  const weekPctText = document.getElementById("weekPctText");
+  const weekIstCompact = document.getElementById("weekIstCompact");
+  const weekGoalCompact = document.getElementById("weekGoalCompact");
+
+  const dayFill = document.getElementById("dayFill");
+  const liveStars = document.getElementById("liveStars");
+
   if(!ch){
     titleEl.textContent = "Keine Challenge";
     [weekGoal, weekIst, dayGoal, dayIst].forEach(e=> e.textContent = "0,00");
     weekPct.textContent = "0,00%";
+    dayFill.style.width = "0%";
+    liveStars.textContent = "0";
+    weekGlow.style.width = "0%";
+    weekPctText.textContent = "0,00%";
+    weekIstCompact.textContent = "0";
+    weekGoalCompact.textContent = "0";
     tweenRing(ring, 0);
     return;
   }
 
   titleEl.textContent = ch.title || "Team Challenge";
-  // Animate numbers only if changed
-  tweenNumber(weekGoal, Number(ch.week?.ziel || 0));
-  tweenNumber(weekIst,  Number(ch.week?.ist  || 0));
-  tweenPercent(weekPct, Number(ch.week?.progressPct || 0));
-  tweenNumber(dayGoal,  Number(ch.day?.ziel  || 0));
-  tweenNumber(dayIst,   Number(ch.day?.ist   || 0));
-  dayPct.textContent = fmtDE(Number(ch.day?.progressPct || 0)) + "%";
 
-  tweenRing(ring, Number(ch.week?.progressPct || 0));
+  const wGoal = Number(ch.week?.ziel || 0);
+  const wIst  = Number(ch.week?.ist  || 0);
+  const wPct  = Number(ch.week?.progressPct || 0);
+  const dGoal = Number(ch.day?.ziel  || 0);
+  const dIst  = Number(ch.day?.ist   || 0);
+  const dPct  = Number(ch.day?.progressPct || 0);
+
+  // Zahlen/Ring
+  tweenNumber(weekGoal, wGoal);
+  tweenNumber(weekIst,  wIst);
+  tweenPercent(weekPct, wPct);
+  tweenNumber(dayGoal,  dGoal);
+  tweenNumber(dayIst,   dIst);
+  dayPct.textContent = fmtDE(dPct) + "%";
+  tweenRing(ring, wPct);
+
+  // Flashy week bar
+  weekGlow.style.width = Math.max(0, Math.min(100, wPct)) + "%";
+  weekPctText.textContent = fmtDE(wPct) + "%";
+  weekIstCompact.textContent = fmtInt(wIst);
+  weekGoalCompact.textContent = fmtInt(wGoal);
+
+  // Day milestones bar + ticks + live stars
+  const dFillPct = dGoal > 0 ? Math.max(0, Math.min(100, (dIst / dGoal) * 100)) : 0;
+  dayFill.style.width = dFillPct + "%";
+  buildDayTicks(dGoal);
+  liveStars.textContent = fmtInt(dIst);
 }
 
-/* =========================
-   INIT / EVENTS / POLL
-   ========================= */
-async function refresh(){
-  const data = await fetchData();
-  updateUI(data);
-}
+/* ========== INIT ========= */
+async function refresh(){ const data = await fetchData(); updateUI(data); }
 
 function setupPasswords(){
   const siteOverlay = document.getElementById("siteOverlay");
   const app = document.getElementById("app");
-
-  function enterSite(){
-    if(isAuthed(keySite)){ hide(siteOverlay); show(app); return true; }
-    return false;
-  }
+  function enterSite(){ if(isAuthed(keySite)){ hide(siteOverlay); show(app); return true; } return false; }
   if(!enterSite()){ show(siteOverlay); }
   document.getElementById("siteLogin").addEventListener("click", ()=>{
     const v = (document.getElementById("sitePw").value||"").trim();
@@ -508,7 +549,7 @@ function setupPasswords(){
     else alert("Falsches Passwort.");
   });
 
-  // Area locks (day/week)
+  // Area locks
   const areaOverlay = document.getElementById("areaOverlay");
   function setAreaUnlocked(){
     if(isAuthed(keyArea)){
@@ -523,26 +564,19 @@ function setupPasswords(){
     return false;
   }
   setAreaUnlocked();
-
-  function promptArea(){
-    if(setAreaUnlocked()) return;
-    show(areaOverlay);
-    document.getElementById("areaPw").value = "";
-  }
+  function promptArea(){ if(setAreaUnlocked()) return; show(areaOverlay); document.getElementById("areaPw").value = ""; }
   document.getElementById("dayUnlock").addEventListener("click", promptArea);
   document.getElementById("weekUnlock").addEventListener("click", promptArea);
   document.getElementById("areaCancel").addEventListener("click", ()=> hide(areaOverlay));
   document.getElementById("areaLogin").addEventListener("click", ()=>{
     const v = (document.getElementById("areaPw").value||"").trim();
     if(v===AREA_PW){
-      setAuthed(keyArea);
-      hide(areaOverlay);
-      setAreaUnlocked();
-      if(lastPayload){ // build lists immediately
+      setAuthed(keyArea); hide(areaOverlay); setAreaUnlocked();
+      if(lastPayload){
         buildRankList(document.getElementById("dayList"), lastPayload.day || []);
         buildRankList(document.getElementById("weekList"), lastPayload.week || []);
       }
-    }else alert("Falsches Passwort.");
+    } else alert("Falsches Passwort.");
   });
 }
 
@@ -550,8 +584,7 @@ function setupUI(){
   document.getElementById("challengeSelect").addEventListener("change", (e)=>{
     currentChallengeIndex = Number(e.target.value||0);
     if(lastPayload && lastPayload.challenges){
-      const ch = lastPayload.challenges[currentChallengeIndex];
-      renderChallenge(ch);
+      renderChallenge(lastPayload.challenges[currentChallengeIndex]);
     }
   });
   const btnStats = document.getElementById("viewStats");
@@ -559,19 +592,15 @@ function setupUI(){
   const racePanel = document.getElementById("racePanel");
   btnStats.addEventListener("click", ()=>{
     btnStats.classList.add("active"); btnRace.classList.remove("active");
-    racePanel.setAttribute("aria-hidden","true");
-    racePanel.style.display = "none";
+    racePanel.setAttribute("aria-hidden","true"); racePanel.style.display = "none";
   });
   btnRace.addEventListener("click", ()=>{
     btnRace.classList.add("active"); btnStats.classList.remove("active");
-    racePanel.removeAttribute("aria-hidden");
-    racePanel.style.display = "block";
+    racePanel.removeAttribute("aria-hidden"); racePanel.style.display = "block";
   });
 }
 
-/* =========================
-   START
-   ========================= */
+/* START */
 (async function(){
   setupPasswords();
   setupUI();
