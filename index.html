@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>RHODENBURG – Übersicht</title>
 <meta name="color-scheme" content="dark light">
 <style>
   :root{
+    /* leicht kompaktere Grundgröße (~-20%) */
+    --fs-base: 13px;
+
     --bg:#0b0f17; --bg2:#0f1522; --panel:#0d1423; --panel2:#0e1628;
     --text:#eaf2ff; --muted:#9fb3d9; --line:#22365e;
     --accent:#59a6ff; --accent2:#9ad1ff;
@@ -16,52 +19,46 @@
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
-    margin:0; background: radial-gradient(1200px 760px at 70% 8%, #14203a 0%, var(--bg) 55%) fixed;
-    color:var(--text); font:500 16px/1.35 ui-sans-serif, system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    margin:0; background: radial-gradient(1000px 620px at 70% 8%, #14203a 0%, var(--bg) 55%) fixed;
+    color:var(--text);
+    font:500 var(--fs-base)/1.35 ui-sans-serif, system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
   }
 
   /* ===== LAYOUT ===== */
-  .wrap{
-    min-height:100dvh; display:grid; gap:16px; padding:16px;
-    grid-template-rows:auto auto 1fr;
-  }
+  .wrap{ min-height:100dvh; display:grid; gap:14px; padding:14px; grid-template-rows:auto auto 1fr; }
 
-  /* Header: links "Aktualisiert", Mitte Brand, rechts Select */
   .top{
-    display:grid; gap:12px; align-items:center;
+    display:grid; gap:10px; align-items:center;
     grid-template-columns: 1fr auto 1fr;
   }
   .updated{
-    justify-self:start; color:var(--muted); font-size:13px; white-space:nowrap;
-    background:linear-gradient(180deg,#0d1423,#0a1120); border:1px solid var(--line); padding:8px 10px; border-radius:12px;
+    justify-self:start; color:var(--muted); font-size:12px; white-space:nowrap;
+    background:linear-gradient(180deg,#0d1423,#0a1120); border:1px solid var(--line); padding:6px 8px; border-radius:10px;
   }
-  .brand{
-    justify-self:center; text-align:center; display:grid; gap:4px; user-select:none;
-  }
+  .brand{ justify-self:center; text-align:center; display:grid; gap:2px; user-select:none; }
   .brand .main{
-    font-weight:900; letter-spacing:.06em; font-size:clamp(22px,3.3vw,36px);
-    text-transform:uppercase; text-shadow: 0 0 12px rgba(154,209,255,.2);
+    font-weight:900; letter-spacing:.055em; font-size:clamp(20px,2.6vw,30px);
+    text-transform:uppercase; text-shadow: 0 0 10px rgba(154,209,255,.2);
   }
   .brand .sub{
-    color:var(--muted); letter-spacing:.6em; font-weight:700; font-size:clamp(10px,1.6vw,14px);
+    color:var(--muted); letter-spacing:.35em; font-weight:700; font-size:clamp(10px,1.3vw,12px);
     text-transform:uppercase; white-space:nowrap;
   }
   .selector{
-    justify-self:end;
-    display:flex; align-items:center; gap:10px;
+    justify-self:end; display:flex; align-items:center; gap:8px;
     background:linear-gradient(180deg,#0f182a,#0a1120);
-    border:1px solid var(--line); border-radius:999px; padding:6px 10px; min-width:260px;
+    border:1px solid var(--line); border-radius:999px; padding:5px 8px; min-width:230px;
     box-shadow:var(--glow);
   }
-  .selector span{color:var(--muted); font-weight:700; letter-spacing:.2px}
+  .selector span{color:var(--muted); font-weight:700; letter-spacing:.15px; font-size:12px}
   .selector select{
     appearance:none; border:1px solid var(--line); background:#0e1628; color:var(--text);
-    padding:8px 10px; border-radius:10px; font-weight:800; min-width:160px; text-align:center;
+    padding:6px 8px; border-radius:9px; font-weight:800; min-width:150px; text-align:center; font-size:12px;
   }
 
-  /* Panels */
+  /* GRID: iPad soll 2 Spalten behalten */
   .grid{
-    display:grid; gap:16px;
+    display:grid; gap:14px;
     grid-template-columns: 1fr 1fr;
     grid-template-areas:
       "day week"
@@ -69,104 +66,110 @@
   }
   .panel{
     background:linear-gradient(180deg, var(--panel2), var(--panel));
-    border:1px solid var(--line); border-radius:20px; box-shadow:var(--glow);
-    padding:16px; min-width:0;
+    border:1px solid var(--line); border-radius:16px; box-shadow:var(--glow);
+    padding:14px; min-width:0;
   }
   .panel h2{
-    margin:0 0 10px 0; font-size:15px; letter-spacing:.25px; color:var(--muted); text-transform:uppercase;
+    margin:0 0 8px 0; font-size:13px; letter-spacing:.25px; color:var(--muted); text-transform:uppercase;
   }
 
-  /* ===== Day Challenge (bar with milestones) ===== */
+  /* ===== Day Challenge ===== */
   .day{ grid-area: day; }
   .goalBig{
-    display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;
+    display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;
     font-weight:900; letter-spacing:.2px;
   }
-  .goalBig .num{ font-size:clamp(26px,4.2vw,36px); }
-  .goalBig .star{ width:24px;height:24px; filter: drop-shadow(0 0 8px rgba(154,209,255,.75)); }
+  .goalBig .num{ font-size:clamp(22px,3.3vw,28px); }
+  .goalBig .star{ width:20px;height:20px; filter: drop-shadow(0 0 7px rgba(154,209,255,.75)); }
   .badgeLive{
-    margin-left:auto; display:inline-flex; align-items:center; gap:8px;
-    background:#e33; color:#fff; font-weight:900; padding:6px 10px; border-radius:10px; letter-spacing:.4px;
-    box-shadow:0 0 12px rgba(255,77,109,.45);
+    margin-left:auto; display:inline-flex; align-items:center; gap:6px;
+    background:#e33; color:#fff; font-weight:900; padding:4px 8px; border-radius:9px; letter-spacing:.35px; font-size:11px;
+    box-shadow:0 0 10px rgba(255,77,109,.45);
   }
-  .barWrap{ margin-top:10px }
+  .barWrap{ margin-top:8px }
   .bar{
-    position:relative; height:18px; border-radius:999px; overflow:hidden;
+    position:relative; height:14px; border-radius:999px; overflow:hidden;
     background:linear-gradient(180deg, #0c1323, #0a1120); border:1px solid var(--line);
   }
   .bar .fill{
     position:absolute; inset:0; width:0%;
     background:linear-gradient(90deg, rgba(89,166,255,.4), rgba(154,209,255,.95));
-    box-shadow:0 0 20px rgba(154,209,255,.5);
+    box-shadow:0 0 16px rgba(154,209,255,.5);
     transition: width .7s cubic-bezier(.2,.8,.2,1);
   }
   .ticks{position:relative; height:0; margin-top:6px}
-  .tick{position:absolute; top:-6px; width:2px; height:30px; background:#29436f; border-radius:2px}
-  .tick label{position:absolute; top:30px; transform:translateX(-50%); color:var(--muted); font-size:12px; white-space:nowrap}
-  .pair{margin-top:8px; color:var(--muted); display:flex; gap:8px; flex-wrap:wrap; font-weight:700}
+  .tick{position:absolute; top:-6px; width:2px; height:24px; background:#29436f; border-radius:2px}
+  .tick label{position:absolute; top:24px; transform:translateX(-50%); color:var(--muted); font-size:11px; white-space:nowrap}
+  .pair{
+    margin-top:6px; color:var(--muted); display:flex; gap:6px; flex-wrap:wrap; font-weight:700; font-size:12px;
+  }
   .pair strong{color:var(--text)}
 
-  /* ===== Week Challenge (circular gauge, no bar) ===== */
+  /* ===== Week Challenge (perfect circle) ===== */
   .week{ grid-area: week; }
-  .gauge{
-    display:grid; grid-template-columns: 180px 1fr; gap:16px; align-items:center;
-  }
+  .gauge{ display:grid; grid-template-columns: 150px 1fr; gap:14px; align-items:center; }
   .ring{
-    position:relative; width:180px; height:180px; min-width:180px;
+    position:relative; width:150px; aspect-ratio:1/1; min-width:150px;
   }
-  .ring svg{width:180px;height:180px; transform:rotate(-90deg)}
-  .ring .center{position:absolute; inset:0; display:grid; place-items:center; text-align:center}
-  .ring .pct{ font-weight:900; font-size:clamp(22px,4.2vw,34px) }
-  .ring .sub{ color:var(--muted); font-size:12px }
+  .ring svg{ width:100%; height:100%; display:block; transform:rotate(-90deg) }
+  .ring .center{
+    position:absolute; inset:0; display:grid; align-content:center; justify-items:center; gap:2px; text-align:center;
+  }
+  .ring .pct{ font-weight:900; font-size:clamp(18px,3.2vw,24px) }
+  .ring .sub{ color:var(--muted); font-size:11px }
   .pulse{
-    position:absolute; inset:-10px; border-radius:50%; pointer-events:none;
-    box-shadow: 0 0 40px rgba(89,166,255,.35), inset 0 0 24px rgba(154,209,255,.18);
+    position:absolute; inset:-8px; border-radius:50%; pointer-events:none;
+    box-shadow: 0 0 32px rgba(89,166,255,.35), inset 0 0 18px rgba(154,209,255,.18);
     animation: pulse 2.6s ease-in-out infinite;
   }
-  @keyframes pulse { 50%{ box-shadow: 0 0 60px rgba(89,166,255,.6), inset 0 0 32px rgba(154,209,255,.28);} }
+  @keyframes pulse { 50%{ box-shadow: 0 0 48px rgba(89,166,255,.6), inset 0 0 26px rgba(154,209,255,.28);} }
+
   .weekStats{
     display:grid; gap:10px; grid-template-columns: repeat(2, minmax(0,1fr));
   }
   .stat{
-    background:#0b1324; border:1px solid var(--line); border-radius:14px; padding:12px 14px;
-    display:flex; justify-content:space-between; align-items:center; gap:10px; min-width:0;
+    background:#0b1324; border:1px solid var(--line); border-radius:12px; padding:10px 12px;
+    display:flex; justify-content:space-between; align-items:center; gap:8px; min-width:0;
   }
-  .stat .label{color:var(--muted); font-size:12px; white-space:nowrap}
-  .stat .value{font-weight:900; font-size:18px; min-width:0}
+  .stat .label{color:var(--muted); font-size:11px; white-space:nowrap}
+  .stat .value{font-weight:900; font-size:16px; min-width:0}
   .truncate{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 
   /* ===== Rankings ===== */
   .rankD{ grid-area:rankD; }
   .rankW{ grid-area:rankW; }
   .list{
-    display:flex; flex-direction:column; gap:10px; margin-top:6px; max-height:46vh; overflow:auto; padding-right:6px
+    display:flex; flex-direction:column; gap:8px; margin-top:6px; max-height:42vh; overflow:auto; padding-right:6px
   }
   .row{
-    display:grid; grid-template-columns: 46px minmax(0,1fr) auto; align-items:center; gap:10px;
-    padding:10px; border:1px solid #23385f; border-radius:12px; background:#0d1423cc; backdrop-filter: blur(4px);
+    display:grid; grid-template-columns: 38px minmax(0,1fr) auto; align-items:center; gap:8px;
+    padding:8px; border:1px solid #23385f; border-radius:10px; background:#0d1423cc; backdrop-filter: blur(4px);
     min-width:0;
   }
-  .medal{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-weight:900;color:#081018; box-shadow: inset 0 0 10px rgba(0,0,0,.35)}
+  .medal{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-weight:900;color:#081018; font-size:13px; box-shadow: inset 0 0 8px rgba(0,0,0,.35)}
   .gold {background:linear-gradient(180deg, #ffe38b, var(--gold)); border:1px solid #9b7c2a}
   .silver{background:linear-gradient(180deg, #e3edf8, var(--silver)); border:1px solid #7a8796}
   .bronze{background:linear-gradient(180deg, #ffd3b0, var(--bronze)); border:1px solid #9a6d42}
   .steel{background:linear-gradient(180deg, #99a6c5, var(--steel)); border:1px solid #586178}
   .name{font-weight:700; min-width:0}
-  .stars{display:flex; align-items:center; gap:8px; font-variant-numeric:tabular-nums}
-  .sstar{width:16px;height:16px;filter: drop-shadow(0 0 6px rgba(106,182,255,.8))}
+  .stars{display:flex; align-items:center; gap:6px; font-variant-numeric:tabular-nums}
+  .sstar{width:14px;height:14px;filter: drop-shadow(0 0 6px rgba(106,182,255,.8))}
 
-  /* ===== Responsive (iPad) ===== */
-  @media (max-width: 1100px){ .gauge{ grid-template-columns: 160px 1fr } .ring,.ring svg{ width:160px;height:160px } }
-  @media (max-width: 1024px){
-    .grid{ grid-template-columns: 1fr; grid-template-areas:
-      "day" "week" "rankD" "rankW"; }
-    .list{ max-height:40vh }
-    .selector{ min-width:220px }
+  /* ===== Responsive: iPad behält 2 Spalten ===== */
+  @media (max-width: 1100px){
+    .gauge{ grid-template-columns: 140px 1fr }
+    .ring{ width:140px; min-width:140px }
   }
-  @media (max-width: 700px){
-    .top{ grid-template-columns: 1fr; }
-    .updated{ justify-self:center }
+  /* erst unter 900px stapeln */
+  @media (max-width: 900px){
+    .grid{ grid-template-columns: 1fr; grid-template-areas: "day" "week" "rankD" "rankW"; }
+    .list{ max-height:40vh }
     .selector{ justify-self:center }
+    .updated{ justify-self:center }
+  }
+  @media (max-width: 620px){
+    .gauge{ grid-template-columns: 1fr; }
+    .ring{ justify-self:center }
   }
 </style>
 </head>
@@ -175,13 +178,11 @@
   <div class="top">
     <div class="updated" id="updatedAt">Aktualisiert: –</div>
 
-    <!-- BRAND CENTER -->
     <div class="brand">
       <div class="main">RHODENBURG</div>
-      <div class="sub">A K T I E N G E S E L L S C H A F T</div>
+      <div class="sub">AKTIENGESELLSCHAFT</div>
     </div>
 
-    <!-- SELECTOR RIGHT -->
     <label class="selector">
       <span>Challenge</span>
       <select id="challengeSelect"></select>
@@ -189,12 +190,12 @@
   </div>
 
   <div class="grid">
-    <!-- DAY -->
+    <!-- TAGES-CHALLENGE -->
     <section class="panel day">
       <h2>TAGES-CHALLENGE</h2>
       <div class="goalBig">
         <span class="num truncate" id="dayGoalBig">0,00</span>
-        <img class="star" alt="★" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='%239ad1ff' viewBox='0 0 24 24'><path d='M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.2l7.1-.6z'/></svg>">
+        <img class="star" alt="★" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='%239ad1ff' viewBox='0 0 24 24'><path d='M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.2l7.1-.6z'/></svg>">
         <span class="badgeLive">LIVE</span>
       </div>
 
@@ -205,14 +206,14 @@
 
       <div class="pair"><span>Heute:</span>
         <strong id="dayIstPair">0</strong>
-        <img class="sstar" alt="★" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2359a6ff' viewBox='0 0 24 24'><path d='M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.2l7.1-.6z'/></svg>">
+        <img class="sstar" alt="★" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%2359a6ff' viewBox='0 0 24 24'><path d='M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.2l7.1-.6z'/></svg>">
         <span>/</span>
         <strong id="dayGoalPair">0</strong>
-        <img class="sstar" alt="★" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%239ad1ff' viewBox='0 0 24 24'><path d='M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.2l7.1-.6z'/></svg>">
+        <img class="sstar" alt="★" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%239ad1ff' viewBox='0 0 24 24'><path d='M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.2l7.1-.6z'/></svg>">
       </div>
     </section>
 
-    <!-- WEEK -->
+    <!-- WOCHEN-CHALLENGE -->
     <section class="panel week">
       <h2>WOCHEN-CHALLENGE</h2>
       <div class="gauge">
@@ -238,16 +239,8 @@
             <div class="value truncate" id="weekGoalBig">0,00 ★</div>
           </div>
           <div class="stat">
-            <div class="label">LIVE (Woche)</div>
+            <div class="label">Aktuell (Woche)</div>
             <div class="value truncate" id="weekIstBig">0,00 ★</div>
-          </div>
-          <div class="stat">
-            <div class="label">LIVE</div>
-            <div class="value truncate" id="weekLiveBadge">0 ★</div>
-          </div>
-          <div class="stat">
-            <div class="label">Rest bis Ziel</div>
-            <div class="value truncate" id="weekRest">0 ★</div>
           </div>
         </div>
       </div>
@@ -268,7 +261,7 @@
 
 <script>
 /* ========== CONFIG ========= */
-const API_URL = "https://script.google.com/macros/s/AKfycbyZUilkl_0BGNzUu3UsJ8U1H75ZCWpcbF08UTYJKmbxLHQZH8T23OCOaUiykZ5Ft41ZGA/exec"; // ← Deine Apps Script Web App URL
+const API_URL = "https://script.google.com/macros/s/AKfycbyZUilkl_0BGNzUu3UsJ8U1H75ZCWpcbF08UTYJKmbxLHQZH8T23OCOaUiykZ5Ft41ZGA/exec"; // ← Apps Script Web App URL
 const POLL_MS = 60000;
 
 /* ========== HELPERS ========= */
@@ -285,9 +278,8 @@ function tween(el, to, fmt="num", dur=600){
 }
 function setText(el, text){ el.textContent = text; }
 
-/* Star SVG (data URI) */
 const star16 = "data:image/svg+xml;utf8,"+
-  "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='16' height='16' fill='%2359a6ff'><path d='M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.2l7.1-.6z'/></svg>";
+  "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='14' height='14' fill='%2359a6ff'><path d='M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.2l7.1-.6z'/></svg>";
 
 function medal(i){ return i===0?"gold":i===1?"silver":i===2?"bronze":"steel"; }
 function buildList(el, items){
@@ -312,7 +304,7 @@ function buildDayTicks(){
   });
 }
 
-/* ========== RING ANIM ========= */
+/* RING ANIM */
 function ringTo(circle, pct, dur=800){
   const C = 2*Math.PI*52;
   const from = Number(circle._pct || 0); const to = Math.max(0, Math.min(100, pct));
@@ -322,14 +314,14 @@ function ringTo(circle, pct, dur=800){
   } requestAnimationFrame(f);
 }
 
-/* ========== FETCH ========= */
+/* FETCH */
 async function fetchData(){
   const r = await fetch(API_URL, { cache:"no-store" });
   if(!r.ok) throw new Error("HTTP "+r.status);
   return r.json();
 }
 
-/* ========== STATE/UPDATE ========= */
+/* STATE/UPDATE */
 let data = null, idx = 0;
 
 function applyChallenge(ch){
@@ -340,23 +332,19 @@ function applyChallenge(ch){
   const wPct  = Number(ch?.week?.progressPct || (wGoal>0? (wIst/wGoal)*100:0));
   const dPct  = Number(ch?.day?.progressPct  || (dGoal>0? (dIst/dGoal)*100:0));
 
-  // Day: Big goal + bar + pair
+  /* Day */
   tween(document.getElementById("dayGoalBig"), dGoal, "num");
   const fill = document.getElementById("dayFill");
   fill.style.width = Math.max(0, Math.min(100, dPct)) + "%";
   buildDayTicks();
-  setText(document.getElementById("dayIstPair"), fmtInt(dIst));
-  setText(document.getElementById("dayGoalPair"), fmtInt(dGoal));
+  document.getElementById("dayIstPair").textContent  = fmtInt(dIst);
+  document.getElementById("dayGoalPair").textContent = fmtInt(dGoal);
 
-  // Week: gauge, stats
-  const ring = document.getElementById("ringProgress");
-  ringTo(ring, wPct);
+  /* Week */
+  ringTo(document.getElementById("ringProgress"), wPct);
   tween(document.getElementById("weekPct"), wPct, "pct");
-  setText(document.getElementById("weekGoalBig"), `${fmtDE(wGoal)} ★`);
-  setText(document.getElementById("weekIstBig"),  `${fmtDE(wIst)} ★`);
-  setText(document.getElementById("weekLiveBadge"), `${fmtInt(wIst)} ★`);
-  const rest = Math.max(0, wGoal - wIst);
-  setText(document.getElementById("weekRest"), `${fmtInt(rest)} ★`);
+  document.getElementById("weekGoalBig").textContent = `${fmtDE(wGoal)} ★`;
+  document.getElementById("weekIstBig").textContent  = `${fmtDE(wIst)} ★`;
 }
 
 function updateUI(payload){
@@ -364,7 +352,6 @@ function updateUI(payload){
   document.getElementById("updatedAt").textContent =
     "Aktualisiert: " + new Date(payload.updatedAt || Date.now()).toLocaleString("de-DE");
 
-  // selector
   const sel = document.getElementById("challengeSelect");
   sel.innerHTML = "";
   (payload.challenges||[]).forEach((c,i)=>{
@@ -379,28 +366,16 @@ function updateUI(payload){
     applyChallenge(payload.challenges[idx]);
   }
 
-  // rankings
   buildList(document.getElementById("dayList"),  payload.day  || []);
   buildList(document.getElementById("weekList"), payload.week || []);
 }
 
-/* ========== INIT ========= */
+/* INIT */
 document.getElementById("challengeSelect").addEventListener("change", (e)=>{
   idx = Number(e.target.value||0);
   if (data && data.challenges) applyChallenge(data.challenges[idx]);
 });
-
-async function refresh(){
-  try{
-    const payload = await fetchData();
-    updateUI(payload);
-  }catch(e){ console.error(e); }
-}
-
-(function start(){
-  refresh();
-  setInterval(refresh, POLL_MS);
-})();
+(function start(){ updateUI({updatedAt:Date.now(), day:[], week:[], challenges:[]}); fetchData().then(updateUI).catch(console.error); setInterval(async()=>{ try{updateUI(await fetchData())}catch(e){} }, POLL_MS); })();
 </script>
 </body>
 </html>
