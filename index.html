@@ -97,9 +97,21 @@
   .tick{position:absolute; top:-5px; width:2px; height:16px; background:#3a5a95; border-radius:2px}
   .tick label{position:absolute; top:16px; transform:translateX(-50%); color:var(--muted); font-size:9px; font-weight:900; white-space:nowrap}
 
-  .pair{ margin-top:6px; color:var(--muted); display:flex; gap:8px; flex-wrap:wrap; font-weight:700; font-size:12px; padding-inline:2px; }
-  .pair strong{color:var(--text)}
-  .pair .sstar:last-child{ margin-left:2px; }
+  /* Kompakte "Heute: xx / xx" Zeile */
+  .pair{
+    margin-top:6px;
+    display:inline-flex;
+    align-items:center;
+    gap:4px;                 /* sehr eng */
+    padding-inline:2px;
+    color:var(--muted);
+    font-weight:700;
+    font-size:11px;          /* kleiner */
+    letter-spacing:0;        /* dicht */
+  }
+  .pair strong{ color:var(--text) }
+  .pair .sstar{ width:11px; height:11px; filter: drop-shadow(0 0 5px rgba(106,182,255,.8)) }
+  .pair .slash{ opacity:.9 }
 
   /* Week Challenge */
   .week{ grid-area: week; }
@@ -256,12 +268,12 @@
         <div class="ticks" id="dayTicks"></div>
       </div>
 
-      <div class="pair"><span>Heute:</span>
-        <strong id="dayIstPair">0</strong>
-        <img class="sstar" alt="★" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='13' height='13' fill='%2359a6ff' viewBox='0 0 24 24'><path d='M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.2l7.1-.6z'/></svg>">
-        <span>/</span>
-        <strong id="dayGoalPair">0</strong>
-        <img class="sstar" alt="★" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='13' height='13' fill='%239ad1ff' viewBox='0 0 24 24'><path d='M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2 3.8 1.6-7L2 9.2l7.1-.6z'/></svg>">
+      <!-- kompakte Heute-Zeile -->
+      <div class="pair" id="dayPair">
+        <span>Heute:</span><strong id="dayIstPair">0</strong>
+        <img class="sstar" alt="★" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='11' height='11' fill='%2359a6ff' viewBox='0 0 24 24'><path d='M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.2l7.1-.6z'/></svg>">
+        <span class="slash">/</span><strong id="dayGoalPair">0</strong>
+        <img class="sstar" alt="★" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='11' height='11' fill='%239ad1ff' viewBox='0 0 24 24'><path d='M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.2l7.1-.6z'/></svg>">
       </div>
     </section>
 
