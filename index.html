@@ -13,7 +13,6 @@
     --accent:#59a6ff; --accent2:#9ad1ff;
     --gold:#ffcc4d; --silver:#c7d2e1; --bronze:#d7a476; --steel:#7f8aa9;
     --glow: 0 0 22px rgba(89,166,255,.35);
-    --daybar-scale: 0.90; /* Zentrierte Balken-Länge relativ zum Abstand Zahl↔LIVE */
   }
   *{box-sizing:border-box}
   html,body{height:100%}
@@ -71,7 +70,7 @@
   .panel h2{ margin:0 0 8px 0; font-size:13px; letter-spacing:.25px; color:var(--muted); text-transform:uppercase; }
 
   /* Day Challenge */
-  .day{ grid-area: day; }
+  .day{ grid-area: day; position:relative; }
   .goalBig{ display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; font-weight:900; letter-spacing:.2px; }
   .goalBig .num{ font-size:clamp(22px,3.3vw,28px); }
   .goalBig .star{ width:20px;height:20px; filter: drop-shadow(0 0 7px rgba(154,209,255,.75)); }
@@ -81,8 +80,14 @@
     box-shadow:0 0 10px rgba(255,77,109,.45);
   }
 
-  /* — Balken: Position & Breite per JS, hier nur Optik — */
-  .barWrap{ margin-top:8px; height:10px; position:relative; }
+  /* — Balken exakt von Zahl (links) bis LIVE (rechts), mit mehr vertikalem Abstand — */
+  .barWrap{
+    margin-top:14px;               /* mehr Abstand oben */
+    margin-bottom:14px;            /* mehr Abstand unten */
+    height:10px;
+    position:relative;             /* bleibt im normalen Flow */
+    width:auto;                    /* Breite wird per JS gesetzt (auto + MarginRight) */
+  }
   .bar{
     position:relative; height:10px; border-radius:999px; overflow:hidden;
     background:linear-gradient(180deg, #0c1323, #0a1120); border:1px solid var(--line);
@@ -95,7 +100,7 @@
     transition: width .7s cubic-bezier(.2,.8,.2,1);
   }
 
-  /* Ticks: Labels gleich, Linien dünner & kürzer */
+  /* Ticks: Labels gleich, Linien dünner & kürzer; 0% wird nicht erzeugt */
   .ticks{position:relative; height:0; margin-top:6px}
   .tick{position:absolute; top:-5px; width:2px; height:16px; background:#3a5a95; border-radius:2px}
   .tick label{position:absolute; top:16px; transform:translateX(-50%); color:var(--muted); font-size:9px; font-weight:900; white-space:nowrap}
@@ -242,7 +247,7 @@
         <span class="badgeLive" id="badgeLive">LIVE</span>
       </div>
 
-      <!-- Zentrierter Balken (Länge aus Abstand Zahl↔LIVE * --daybar-scale) -->
+      <!-- Balken exakt zwischen Zahl (links) und LIVE (rechts) -->
       <div class="barWrap" id="barWrap">
         <div class="bar"><div class="fill" id="dayFill"></div></div>
         <div class="ticks" id="dayTicks"></div>
@@ -358,7 +363,7 @@ function buildList(el, items){
   });
 }
 
-/* Ticks: 0% entfernt, Linien dünner/kürzer */
+/* Ticks: 0% entfernt; 25/50/75/100% */
 function buildDayTicks(){
   const ticksEl = document.getElementById("dayTicks"); ticksEl.innerHTML = "";
   [25,50,75,100].forEach(p=>{
@@ -378,9 +383,11 @@ function ringTo(circle, pct, dur=800){
   } requestAnimationFrame(f);
 }
 
-/* ===== Zentrierung Tages-Balken =====
-   Behält die (relative) Länge über --daybar-scale bei,
-   positioniert den Balken exakt mittig zwischen Zahl und LIVE. */
+/* ===== Balken exakt spannen und mittig ausrichten =====
+   - Linke Kante = Start der Zahl
+   - Rechte Kante = Ende des LIVE-Badges
+   -> Kein "Blockieren" mehr links, weil wir nicht skaliert, sondern exakt spannen.
+*/
 function alignDayBar(){
   const day = document.getElementById('dayPanel');
   const num = document.getElementById('dayGoalBig');
@@ -392,13 +399,14 @@ function alignDayBar(){
   const rNum  = num.getBoundingClientRect();
   const rLive = live.getBoundingClientRect();
 
-  const span = Math.max(0, rLive.right - rNum.left);                // Gesamtabstand Zahl↔LIVE
-  const scale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--daybar-scale')) || 1;
-  const desired = Math.round(span * Math.max(0.1, Math.min(1, scale))); // gewünschte Länge
+  // Exakte Ränder zwischen Zahl (links) und LIVE (rechts)
+  const leftInset  = Math.max(0, rNum.left  - rDay.left);
+  const rightInset = Math.max(0, rDay.right - rLive.right);
 
-  const leftOffset = (rNum.left - rDay.left) + (span - desired) / 2; // zentriert
-  barWrap.style.width = desired + 'px';
-  barWrap.style.marginLeft = leftOffset + 'px';
+  // Setze linke/rechte "Ränder" über Margins – so bleibt das Element im Flow
+  barWrap.style.marginLeft  = leftInset + 'px';
+  barWrap.style.marginRight = rightInset + 'px';
+  barWrap.style.width = 'auto'; // Breite aus den Margins ableiten
 }
 
 function applyChallenge(ch){
