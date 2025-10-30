@@ -1,456 +1,525 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>RHODENBURG – Übersicht</title>
-<meta name="color-scheme" content="dark light">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Rhodenburg AG – Übersicht & Dashboard</title>
 <style>
-  :root{
-    --fs-base: 13px;
-    --bg:#0b0f17; --bg2:#0f1522; --panel:#0d1423; --panel2:#0e1628;
-    --text:#eaf2ff; --muted:#9fb3d9; --line:#22365e;
-    --accent:#59a6ff; --accent2:#9ad1ff;
-    --gold:#ffcc4d; --silver:#c7d2e1; --bronze:#d7a476; --steel:#7f8aa9;
-    --glow: 0 0 22px rgba(89,166,255,.35);
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0; background: radial-gradient(1000px 620px at 70% 8%, #14203a 0%, var(--bg) 55%) fixed;
-    color:var(--text);
-    font:500 var(--fs-base)/1.35 ui-sans-serif, system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-  }
-  .wrap{ min-height:100dvh; display:grid; gap:14px; padding:14px; grid-template-rows:auto auto 1fr; }
+:root{
+  --bg:#060a12; --panel:#0b1324; --panel2:#0e1628; --line:#1d2b46; --text:#cfe3ff; --muted:#8fa8d4;
+  --accent:#3ea6ff; --accent2:#2ad0ff; --gold:#f6c65b; --silver:#cfd8e6; --bronze:#c7935a;
+  --good:#2ad37f; --warn:#ffcc66; --danger:#ff6b6b; --glow:0 0 28px rgba(62,166,255,.18);
+  --scale:.8; /* ~20% kleiner */
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:radial-gradient(1400px 900px at 20% -10%, #0b1425, #060a12 70%);
+  color:var(--text); font-family:Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+  transform-origin: top center; transform: scale(var(--scale));
+}
+.app{
+  max-width:1200px; margin:24px auto 64px; padding:0 20px; position:relative;
+}
+.header{
+  display:grid; grid-template-columns:1fr auto 1fr; align-items:center; column-gap:16px; margin-bottom:16px;
+}
+.brand{
+  display:grid; justify-items:center; gap:2px;
+}
+.brand .title{
+  font-weight:1000; letter-spacing:.12em; font-size:36px; line-height:1; text-transform:uppercase;
+}
+.brand .subtitle{
+  font-weight:800; letter-spacing:.28em; /* enger als zuvor */ font-size:11px; color:var(--muted);
+  text-transform:uppercase; transform: translateY(-1px);
+}
+.brand .tiny{
+  font-size:10px; color:var(--muted); margin-top:4px; letter-spacing:.04em;
+}
+.rightTop{
+  display:flex; align-items:center; gap:8px; justify-content:flex-end;
+}
+.kv{
+  background:linear-gradient(180deg,#0b1324,#0a1222); border:1px solid var(--line); box-shadow:var(--glow);
+  padding:8px 10px; border-radius:12px; display:flex; gap:10px; align-items:center;
+}
+.kv b{font-size:12px; color:#9fb3d9;}
+select{
+  background:#0b1324; border:1px solid var(--line); color:var(--text);
+  padding:8px 10px; border-radius:10px; font-weight:700;
+}
+.updated{ color:var(--muted); font-size:12px }
 
-  /* Top */
-  .top{ display:grid; gap:8px; align-items:center; grid-template-columns: 1fr auto 1fr; }
-  .updated{
-    justify-self:start; color:var(--muted); font-size:12px; white-space:nowrap;
-    background:linear-gradient(180deg,#0d1423,#0a1120); border:1px solid var(--line); padding:6px 8px; border-radius:10px;
-  }
-  .brand{ justify-self:center; text-align:center; display:grid; gap:2px; user-select:none; }
-  .brand .main{
-    font-weight:900; letter-spacing:.055em; font-size:clamp(20px,2.6vw,30px);
-    text-transform:uppercase; text-shadow: 0 0 10px rgba(154,209,255,.2);
-  }
-  .brand .sub{
-    color:var(--muted); letter-spacing:.22em; font-weight:700; font-size:clamp(10px,1.3vw,12px);
-    text-transform:uppercase; white-space:nowrap;
-  }
-  .brand .code{
-    color:var(--muted); font-size:10px; letter-spacing:.08em; margin-top:2px;
-  }
-  .selector{
-    justify-self:end; display:flex; align-items:center; gap:8px;
-    background:linear-gradient(180deg,#0f182a,#0a1120);
-    border:1px solid var(--line); border-radius:999px; padding:5px 8px; min-width:230px;
-    box-shadow:var(--glow);
-  }
-  .selector span{color:var(--muted); font-weight:700; letter-spacing:.15px; font-size:12px}
-  .selector select{
-    appearance:none; border:1px solid var(--line); background:#0e1628; color:var(--text);
-    padding:6px 8px; border-radius:9px; font-weight:800; min-width:150px; text-align:center; font-size:12px;
-  }
+.grid{
+  display:grid; grid-template-columns:repeat(12,1fr); gap:16px; align-items:stretch;
+}
+.panel{
+  background:linear-gradient(180deg, var(--panel), var(--panel2));
+  border:1px solid var(--line); border-radius:16px; padding:14px; box-shadow:var(--glow); position:relative; overflow:hidden;
+}
+.panel h2{
+  margin:0 0 10px; font-size:14px; letter-spacing:.12em; text-transform:uppercase; color:#9fb3d9;
+}
 
-  /* Grid */
-  .grid{
-    display:grid; gap:14px;
-    grid-template-columns: 1fr 1fr;
-    grid-template-areas:
-      "day week"
-      "rankD rankW";
-  }
-  .panel{
-    background:linear-gradient(180deg, var(--panel2), var(--panel));
-    border:1px solid var(--line); border-radius:16px; box-shadow:var(--glow);
-    padding:16px 14px 20px; /* etwas tiefer für Ticks */
-    min-width:0;
-  }
-  .panel h2{ margin:0 0 8px 0; font-size:13px; letter-spacing:.25px; color:var(--muted); text-transform:uppercase; }
+/* Tages-Challenge */
+.dayBox{ grid-column:1/13; }
+.meterWrap{
+  display:grid; gap:10px; margin-top:10px; padding:10px 10px 14px; /* tiefer gelegt */
+  background:linear-gradient(180deg,#0a1221,#0e1628); border:1px solid #14203a; border-radius:12px;
+}
+.milestones{
+  display:flex; justify-content:space-between; position:relative; height:28px; /* etwas mehr Luft */
+}
+.milestones .mark{
+  position:relative; width:0; height:100%;
+}
+.milestones .label{
+  position:absolute; top:-10px; transform:translateX(-50%); font-size:10px; color:#9fb3d9; white-space:nowrap;
+}
+.milestones .label.hundred{ transform:translateX(calc(-50% - 6px)); } /* 100% leicht nach links */
+.progressBar{
+  height:12px; border-radius:999px; background:#0a1330; border:1px solid #1a2b56; position:relative; overflow:hidden;
+}
+.progressBar .liveTag{
+  position:absolute; left:8px; top:50%; transform:translateY(-50%); font-size:10px; color:#7fb7ff; font-weight:800; letter-spacing:.1em;
+}
+.progressBar .fill{
+  position:absolute; inset:0; width:0%;
+  background:linear-gradient(90deg,#2a86ff 0%, #2ad0ff 40%, #7cf9ff 100%);
+  box-shadow:0 0 20px rgba(46,180,255,.35) inset, 0 0 14px rgba(46,180,255,.45);
+  border-radius:999px;
+  transition:width .6s cubic-bezier(.22,.8,.2,1);
+}
+.smallNote{
+  font-size:12px; color:#9fb3d9; display:flex; gap:8px; align-items:center; justify-content:flex-end;
+}
 
-  /* Day Challenge */
-  .day{ grid-area: day; }
-  .goalBig{ display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; font-weight:900; letter-spacing:.2px; }
-  .goalBig .num{ font-size:clamp(22px,3.3vw,28px); }
-  .goalBig .star{ width:20px;height:20px; filter: drop-shadow(0 0 7px rgba(154,209,255,.75)); }
-  .badgeLive{
-    margin-left:auto; display:inline-flex; align-items:center; gap:6px;
-    background:#e33; color:#fff; font-weight:900; padding:4px 8px; border-radius:9px; letter-spacing:.35px; font-size:11px;
-    box-shadow:0 0 10px rgba(255,77,109,.45);
-  }
-  .barWrap{ margin-top:10px }
-  .bar{
-    position:relative; height:14px; border-radius:999px; overflow:hidden;
-    background:linear-gradient(180deg, #0c1323, #0a1120); border:1px solid var(--line);
-  }
-  .bar .fill{
-    position:absolute; inset:0; width:0%;
-    background:linear-gradient(90deg, rgba(89,166,255,.4), rgba(154,209,255,.95));
-    box-shadow:0 0 16px rgba(154,209,255,.5);
-    transition: width .7s cubic-bezier(.2,.8,.2,1);
-  }
-  .ticks{position:relative; height:0; margin-top:10px}
-  .tick{position:absolute; top:-6px; width:2px; height:24px; background:#29436f; border-radius:2px}
-  .tick label{position:absolute; top:24px; transform:translateX(-50%); color:var(--muted); font-size:11px; white-space:nowrap}
-  .pair{ margin-top:6px; color:var(--muted); display:flex; gap:6px; flex-wrap:wrap; font-weight:700; font-size:12px; }
-  .pair strong{color:var(--text)}
+/* Wochen-Challenge */
+.weekBox{ grid-column:1/13; }
+.weekWrap{ display:grid; grid-template-columns:220px 1fr; gap:16px; align-items:center; }
+.radial{
+  width:220px; height:220px; border-radius:50%;
+  background:radial-gradient(120px 120px at 50% 45%, #152544, #0e1628 80%);
+  display:grid; place-items:center; position:relative;
+  border:1px solid #1a2b56; box-shadow:var(--glow);
+}
+.radial svg{ width:170px; height:170px; display:block; }
+.radial .center{
+  position:absolute; inset:0; display:grid; place-items:center; pointer-events:none; text-align:center;
+}
+.radial .pct{ font-size:22px; font-weight:1000; letter-spacing:.04em; }
+.radial .cap{ font-size:11px; color:#9fb3d9; margin-top:2px; }
+.weekRight{
+  display:flex; align-items:center; justify-content:center; height:100%;
+  font-size:32px; font-weight:1000; letter-spacing:.02em;
+}
+.weekRight .big{ display:flex; gap:12px; align-items:center; flex-wrap:wrap }
+.star{ width:18px; height:18px; display:inline-block; transform:translateY(2px); }
+.star svg{ width:100%; height:100%; filter: drop-shadow(0 0 6px rgba(80,200,255,.5)); }
 
-  /* Week Challenge */
-  .week{ grid-area: week; }
-  .gauge{ display:grid; grid-template-columns: 160px 1fr; gap:14px; align-items:center; }
-  .ring{ position:relative; width:160px; aspect-ratio:1 / 1; min-width:160px; }
-  .ring svg{ width:100%; height:100%; display:block; transform:rotate(-90deg) }
-  .ring .center{ position:absolute; inset:0; display:grid; align-content:center; justify-items:center; gap:2px; text-align:center; }
-  .ring .pct{ font-weight:900; font-size:clamp(18px,3.2vw,22px) }
-  .ring .sub{ color:var(--muted); font-size:11px }
-  .pulse{
-    position:absolute; inset:-8px; border-radius:50%; pointer-events:none;
-    box-shadow: 0 0 32px rgba(89,166,255,.35), inset 0 0 18px rgba(154,209,255,.18);
-    animation: pulse 2.6s ease-in-out infinite;
-  }
-  .weekPair{
-    display:flex; align-items:center; justify-content:center;
-    font-weight:900; font-size:clamp(18px,3.0vw,24px); gap:10px; flex-wrap:wrap;
-  }
-  .weekPair .star{ width:18px; height:18px; filter: drop-shadow(0 0 7px rgba(154,209,255,.75)); }
-  .slash{ color:var(--muted); font-weight:700 }
+/* Rankings nebeneinander */
+.rankRow{ grid-column:1/13; display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.rankD,.rankW{ min-height:300px; }
+.list{ display:grid; gap:10px }
+.item{
+  display:grid; grid-template-columns:44px 1fr auto; gap:10px; align-items:center;
+  padding:10px; border:1px solid #122242; border-radius:12px;
+  background:linear-gradient(180deg,#0b1324,#0c1528);
+}
+.rankNum{ font-size:16px; font-weight:1000; text-align:center; }
+.name{ font-weight:900; letter-spacing:.02em }
+.score{ font-weight:1000; display:flex; align-items:center; gap:8px; font-size:14px }
+.badge{ width:28px; height:28px; border-radius:50% }
+.badge.gold{ background:radial-gradient(14px 14px at 40% 35%, #ffeaa6, #f6c65b); box-shadow:0 0 14px rgba(246,198,91,.35) }
+.badge.silver{ background:radial-gradient(14px 14px at 40% 35%, #ffffff, #cfd8e6); box-shadow:0 0 14px rgba(207,216,230,.35) }
+.badge.bronze{ background:radial-gradient(14px 14px at 40% 35%, #ffd7b0, #c7935a); box-shadow:0 0 14px rgba(199,147,90,.35) }
 
-  /* Rankings */
-  .rankD{ grid-area:rankD; position:relative }
-  .rankW{ grid-area:rankW; position:relative }
-  .list{
-    display:flex; flex-direction:column; gap:8px; margin-top:6px; max-height:42vh; overflow:auto; padding-right:6px
-  }
-  .row{
-    display:grid; grid-template-columns: 38px minmax(0,1fr) auto; align-items:center; gap:8px;
-    padding:8px; border:1px solid #23385f; border-radius:10px; background:#0d1423cc; backdrop-filter: blur(4px);
-    min-width:0;
-  }
-  .medal{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-weight:900;color:#081018; font-size:13px; box-shadow: inset 0 0 8px rgba(0,0,0,.35)}
-  .gold {background:linear-gradient(180deg, #ffe38b, var(--gold)); border:1px solid #9b7c2a}
-  .silver{background:linear-gradient(180deg, #e3edf8, var(--silver)); border:1px solid #7a8796}
-  .bronze{background:linear-gradient(180deg, #ffd3b0, var(--bronze)); border:1px solid #9a6d42}
-  .steel{background:linear-gradient(180deg, #99a6c5, var(--steel)); border:1px solid #586178}
-  .name{font-weight:700; min-width:0}
-  .stars{display:flex; align-items:center; gap:6px; font-variant-numeric:tabular-nums}
-  .sstar{width:14px;height:14px;filter: drop-shadow(0 0 6px rgba(106,182,255,.8))}
+/* Click-to-unlock Cover (Ranking) */
+.tapCover{
+  position:absolute; inset:0; display:grid; place-items:center;
+  background:linear-gradient(180deg, rgba(9,13,22,.78), rgba(9,13,22,.86));
+  border:1px dashed #39507c; border-radius:16px; z-index:4; cursor:pointer;
+  color:#cfe3ff; font-weight:800; letter-spacing:.2px; text-align:center; padding:16px;
+}
+.tapCover span{ opacity:.85; font-size:13px }
+.tapCover .hint{ color:#9fb3d9; font-weight:600; font-size:12px; margin-top:6px }
 
-  /* Locks */
-  .lockOverlay{
-    position:absolute; inset:0; backdrop-filter: blur(6px);
-    background: linear-gradient(180deg, rgba(9,13,22,.75), rgba(9,13,22,.85));
-    border-radius:16px; display:grid; place-items:center; z-index:4;
-    border:1px dashed #39507c;
-  }
-  .lockCard{
-    background:#0e1628; border:1px solid var(--line); border-radius:12px; padding:14px; min-width:260px;
-    display:grid; gap:8px; text-align:center; box-shadow:var(--glow);
-  }
-  .lockCard h3{ margin:0; font-size:14px; color:var(--muted); text-transform:uppercase; letter-spacing:.2px }
-  .lockCard input{
-    background:#0b1324; color:var(--text); border:1px solid var(--line); border-radius:9px; padding:8px; text-align:center; font-weight:800;
-  }
-  .lockCard button{
-    background:linear-gradient(180deg,#123361,#0b2244); color:#cfe3ff; border:1px solid #28508a;
-    padding:8px 10px; border-radius:9px; font-weight:900; cursor:pointer;
-  }
+/* Modals (Site + Ranking) */
+.modalBackdrop{
+  position:fixed; inset:0; display:none; place-items:center; z-index:10000;
+  background:radial-gradient(900px 600px at 50% 25%, rgba(17,28,51,.92), rgba(7,11,20,.94));
+}
+.modal{ background:#0e1628; border:1px solid var(--line); border-radius:12px; padding:16px;
+  width:min(92vw, 360px); box-shadow:var(--glow); display:grid; gap:10px; text-align:center;
+}
+.modal h3{ margin:0; font-size:14px; color:var(--muted); text-transform:uppercase; letter-spacing:.2px }
+.modal input{
+  background:#0b1324; color:var(--text); border:1px solid var(--line);
+  border-radius:9px; padding:10px; text-align:center; font-weight:800;
+}
+.modal .rowBtns{ display:flex; gap:8px; justify-content:center }
+.modal button{
+  background:linear-gradient(180deg,#123361,#0b2244); color:#cfe3ff; border:1px solid #28508a;
+  padding:9px 12px; border-radius:9px; font-weight:900; cursor:pointer; min-width:110px;
+}
 
-  /* Page gate */
-  .pageGate{
-    position:fixed; inset:0; display:grid; place-items:center; background:radial-gradient(1200px 800px at 50% 15%, #111c33, #070b14 60%);
-    z-index:9999;
-  }
-
-  /* Responsive */
-  @media (max-width: 1100px){
-    .gauge{ grid-template-columns: 150px 1fr }
-    .ring{ width:150px; min-width:150px }
-  }
-  @media (max-width: 900px){
-    .grid{ grid-template-columns: 1fr; grid-template-areas: "day" "week" "rankD" "rankW"; }
-    .list{ max-height:40vh }
-    .selector{ justify-self:center }
-    .updated{ justify-self:center }
-  }
-  @media (max-width: 620px){
-    .gauge{ grid-template-columns: 1fr; }
-    .ring{ justify-self:center }
-    .weekPair{ justify-content:center; text-align:center }
-  }
+/* helper */
+.row{ display:flex; align-items:center; gap:12px; flex-wrap:wrap }
+.label{ font-size:12px; color:#9fb3d9; letter-spacing:.12em; text-transform:uppercase; font-weight:900 }
+.val{ font-weight:1000; }
+.liveChip{ color:#7cf9ff; font-weight:900; letter-spacing:.18em; font-size:11px }
+hr.sep{ border:none; border-top:1px solid #14203a; margin:8px 0 }
 </style>
 </head>
 <body>
-<!-- Page-wide password gate -->
-<div class="pageGate" id="pageGate">
-  <div class="lockCard">
-    <h3>Zugriff geschützt</h3>
-    <input type="password" id="sitePwd" placeholder="Passwort" autocomplete="current-password"/>
-    <button id="siteBtn">Anmelden</button>
-    <div style="color:var(--muted); font-size:12px">Bleibt 24h auf diesem Gerät angemeldet.</div>
-  </div>
-</div>
+<div class="app" id="app">
 
-<div class="wrap" aria-hidden="true" id="appRoot">
-  <div class="top">
-    <div class="updated" id="updatedAt">Aktualisiert: –</div>
+  <div class="header">
+    <div class="updated">Aktualisiert: <span id="updatedAt">–</span></div>
 
     <div class="brand">
-      <div class="main">RHODENBURG</div>
-      <div class="sub">AKTIENGESELLSCHAFT</div>
-      <div class="code">Test.va.3248Z3.01</div>
+      <div class="title">RHODENBURG</div>
+      <div class="subtitle">AKTIENGESELLSCHAFT</div>
+      <div class="tiny">Test.va.3248Z3.01</div>
     </div>
 
-    <label class="selector">
-      <span>Challenge</span>
-      <select id="challengeSelect"></select>
-    </label>
+    <div class="rightTop">
+      <div class="kv">
+        <b>Challenge</b>
+        <select id="challengeSelect"></select>
+      </div>
+    </div>
   </div>
 
   <div class="grid">
-    <!-- TAGES-CHALLENGE -->
-    <section class="panel day">
-      <h2>TAGES-CHALLENGE</h2>
-      <div class="goalBig">
-        <span class="num truncate" id="dayGoalBig">0,00</span>
-        <img class="star" alt="★" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='%239ad1ff' viewBox='0 0 24 24'><path d='M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.2l7.1-.6z'/></svg>">
-        <span class="badgeLive">LIVE</span>
+
+    <!-- Tages-Challenge -->
+    <section class="panel dayBox">
+      <h2>Tages-Challenge</h2>
+      <div class="row">
+        <div class="label">Ziel</div>
+        <div class="val" id="dayGoal">–</div>
+        <span class="star" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l2.7 5.7 6.3.9-4.6 4.5 1.1 6.4-5.6-3-5.6 3 1.1-6.4L3 8.6l6.3-.9L12 2z" fill="#6dd3ff"/></svg>
+        </span>
       </div>
 
-      <div class="barWrap">
-        <div class="bar"><div class="fill" id="dayFill"></div></div>
-        <div class="ticks" id="dayTicks"></div>
+      <div class="meterWrap">
+        <div class="milestones" id="dayMilestones">
+          <!-- 25/50/75/100 (ohne 0) -->
+          <div class="mark" style="left:25%"><div class="label">25%</div></div>
+          <div class="mark" style="left:50%"><div class="label">50%</div></div>
+          <div class="mark" style="left:75%"><div class="label">75%</div></div>
+          <div class="mark" style="left:100%"><div class="label hundred">100%</div></div>
+        </div>
+        <div class="progressBar">
+          <div class="liveTag">LIVE</div>
+          <div class="fill" id="dayFill" style="width:0%"></div>
+        </div>
       </div>
 
-      <div class="pair"><span>Heute:</span>
-        <strong id="dayIstPair">0</strong>
-        <img class="sstar" alt="★" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%2359a6ff' viewBox='0 0 24 24'><path d='M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.2l7.1-.6z'/></svg>">
-        <span>/</span>
-        <strong id="dayGoalPair">0</strong>
-        <img class="sstar" alt="★" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%239ad1ff' viewBox='0 0 24 24'><path d='M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.2l7.1-.6z'/></svg>">
+      <div class="smallNote">
+        <span id="dayIst">0</span>
+        <span class="star" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l2.7 5.7 6.3.9-4.6 4.5 1.1 6.4-5.6-3-5.6 3 1.1-6.4L3 8.6l6.3-.9L12 2z" fill="#6dd3ff"/></svg>
+        </span>
+        /
+        <span id="dayZiel">0</span>
+        <span class="star" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l2.7 5.7 6.3.9-4.6 4.5 1.1 6.4-5.6-3-5.6 3 1.1-6.4L3 8.6l6.3-.9L12 2z" fill="#6dd3ff"/></svg>
+        </span>
       </div>
     </section>
 
-    <!-- WOCHEN-CHALLENGE -->
-    <section class="panel week">
-      <h2>WOCHEN-CHALLENGE</h2>
-      <div class="gauge">
-        <div class="ring">
-          <svg viewBox="0 0 120 120" aria-hidden="true">
+    <!-- Wochen-Challenge -->
+    <section class="panel weekBox">
+      <h2>Wochen-Challenge</h2>
+      <div class="weekWrap">
+        <div class="radial">
+          <!-- sauberer Kreis (quadratisches viewBox) -->
+          <svg viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="42" stroke="#132447" stroke-width="10" fill="none"/>
+            <circle id="weekArc" cx="50" cy="50" r="42" stroke="url(#grad)" stroke-width="10" fill="none"
+                    stroke-linecap="round" transform="rotate(-90 50 50)" stroke-dasharray="264" stroke-dashoffset="264"/>
             <defs>
-              <linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#59a6ff"/><stop offset="100%" stop-color="#9ad1ff"/>
+              <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#2a86ff"/><stop offset="50%" stop-color="#2ad0ff"/><stop offset="100%" stop-color="#7cf9ff"/>
               </linearGradient>
             </defs>
-            <circle cx="60" cy="60" r="52" stroke="#1a2a4b" stroke-width="12" fill="none"/>
-            <circle id="ringProgress" cx="60" cy="60" r="52" stroke="url(#rg)" stroke-width="12" fill="none" stroke-linecap="round" stroke-dasharray="326.73" stroke-dashoffset="326.73"/>
           </svg>
           <div class="center">
-            <div class="pct" id="weekPct">0,00%</div>
-            <div class="sub">Fortschritt</div>
+            <div class="pct" id="weekPct">0%</div>
+            <div class="cap">Fortschritt</div>
           </div>
-          <div class="pulse" aria-hidden="true"></div>
         </div>
-
-        <!-- Großes IST/ZIEL rechts neben Kreis -->
-        <div class="weekPair">
-          <span id="weekIstBig">0,00</span>
-          <img class="star" alt="★" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' fill='%2359a6ff' viewBox='0 0 24 24'><path d='M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.2l7.1-.6z'/></svg>">
-          <span class="slash">/</span>
-          <span id="weekGoalBig">0,00</span>
-          <img class="star" alt="★" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' fill='%239ad1ff' viewBox='0 0 24 24'><path d='M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.2l7.1-.6z'/></svg>">
-        </div>
-      </div>
-    </section>
-
-    <!-- RANKINGS -->
-    <section class="panel rankD" id="rankDPanel">
-      <h2>Tagesranking</h2>
-      <div class="list" id="dayList"></div>
-      <div class="lockOverlay" id="lockRank">
-        <div class="lockCard">
-          <h3>Ranking geschützt</h3>
-          <input type="password" id="rankPwd" placeholder="Passwort"/>
-          <button id="rankBtn">Entsperren</button>
+        <div class="weekRight">
+          <div class="big">
+            <span id="weekIst" title="aktuell">0</span>
+            <span class="star"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l2.7 5.7 6.3.9-4.6 4.5 1.1 6.4-5.6-3-5.6 3 1.1-6.4L3 8.6l6.3-.9L12 2z" fill="#6dd3ff"/></svg></span>
+            <span style="opacity:.6">/</span>
+            <span id="weekZiel" title="Ziel">0</span>
+            <span class="star"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l2.7 5.7 6.3.9-4.6 4.5 1.1 6.4-5.6-3-5.6 3 1.1-6.4L3 8.6l6.3-.9L12 2z" fill="#6dd3ff"/></svg></span>
+          </div>
         </div>
       </div>
     </section>
 
-    <section class="panel rankW" id="rankWPanel">
-      <h2>Wochenranking</h2>
-      <div class="list" id="weekList"></div>
-      <!-- derselbe Overlay wird per JS für beide Panels versteckt -->
-    </section>
+    <!-- Rankings nebeneinander -->
+    <div class="rankRow">
+      <section class="panel rankD" id="rankDPanel">
+        <h2>Tagesranking</h2>
+        <div class="list" id="dayList"></div>
+
+        <!-- Tap-to-unlock Overlay -->
+        <div class="tapCover" data-panel="rank">
+          <div>
+            <div style="font-size:15px; font-weight:900; margin-bottom:4px;">🔒 Bereich geschützt</div>
+            <span>Zum Entsperren tippen/klicken</span>
+            <div class="hint">Ranking-Passwort erforderlich</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel rankW" id="rankWPanel">
+        <h2>Wochenranking</h2>
+        <div class="list" id="weekList"></div>
+
+        <!-- Tap-to-unlock Overlay -->
+        <div class="tapCover" data-panel="rank">
+          <div>
+            <div style="font-size:15px; font-weight:900; margin-bottom:4px;">🔒 Bereich geschützt</div>
+            <span>Zum Entsperren tippen/klicken</span>
+            <div class="hint">Ranking-Passwort erforderlich</div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal: Seiten-Passwort -->
+<div class="modalBackdrop" id="siteModal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="siteModalTitle">
+    <h3 id="siteModalTitle">Zugang geschützt</h3>
+    <input type="password" id="sitePwdInput" placeholder="Seiten-Passwort" autocomplete="current-password"/>
+    <div class="rowBtns">
+      <button id="siteOkBtn">Anmelden</button>
+    </div>
+    <div style="color:var(--muted); font-size:12px">Wird für 24&nbsp;Stunden gemerkt.</div>
+  </div>
+</div>
+
+<!-- Modal: Ranking-Passwort -->
+<div class="modalBackdrop" id="rankModal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="rankModalTitle">
+    <h3 id="rankModalTitle">Ranking entsperren</h3>
+    <input type="password" id="rankPwdInput" placeholder="Ranking-Passwort" autocomplete="current-password"/>
+    <div class="rowBtns">
+      <button id="rankCancelBtn">Abbrechen</button>
+      <button id="rankOkBtn">Entsperren</button>
+    </div>
+    <div style="color:var(--muted); font-size:12px">Wird für 24&nbsp;Stunden gemerkt.</div>
   </div>
 </div>
 
 <script>
-/* ===== CONFIG ===== */
-const API_URL = "https://script.google.com/macros/s/AKfycbyZUilkl_0BGNzUu3UsJ8U1H75ZCWpcbF08UTYJKmbxLHQZH8T23OCOaUiykZ5Ft41ZGA/exec";     // ← Apps Script Web App URL
-const POLL_MS = 20000;                               // Auto-Refresh
-const SITE_PWD = "Rhodenburg";
-const RANK_PWD = "Rhodenburg1234";
-const DAY_MS = 24*60*60*1000;
+const API_URL = "https://script.google.com/macros/s/AKfycbyZUilkl_0BGNzUu3UsJ8U1H75ZCWpcbF08UTYJKmbxLHQZH8T23OCOaUiykZ5Ft41ZGA/exec"; // <- hier deine Apps-Script-Web-App URL eintragen
+const REFRESH_MS = 20000;
 
-/* ===== HELPERS ===== */
-const fmtDE = (n, f=2)=> new Intl.NumberFormat("de-DE",{minimumFractionDigits:f,maximumFractionDigits:f}).format(Number(n||0));
-const fmtInt = n => new Intl.NumberFormat("de-DE",{maximumFractionDigits:0}).format(Number(n||0));
-function tween(el, to, fmt="num", dur=600){
-  const from = Number(el._v || 0); const diff = to - from; const t0 = performance.now();
-  function frame(t){ const p = Math.min(1,(t-t0)/dur); const e = 1-Math.pow(1-p,3); const v = from + diff*e;
-    if(fmt==="int") el.textContent = fmtInt(v);
-    else if(fmt==="pct") el.textContent = fmtDE(v) + "%";
-    else el.textContent = fmtDE(v);
-    el._v = v; if(p<1) requestAnimationFrame(frame);
-  } requestAnimationFrame(frame);
-}
-function buildList(el, items){
-  el.innerHTML = "";
-  const star16 = "data:image/svg+xml;utf8,"+
-    "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='14' height='14' fill='%2359a6ff'><path d='M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.2l7.1-.6z'/></svg>";
-  (items||[]).forEach((it,i)=>{
-    const row = document.createElement("div");
-    row.className = "row";
-    row.innerHTML = `
-      <div class="medal ${i===0?"gold":i===1?"silver":i===2?"bronze":"steel"}">${i+1}</div>
-      <div class="name truncate">${it.name}</div>
-      <div class="stars"><strong>${fmtInt(it.stars)}</strong> <img class="sstar" alt="★" src="${star16}"></div>`;
-    el.appendChild(row);
-  });
-}
-function buildDayTicks(){
-  const ticksEl = document.getElementById("dayTicks"); ticksEl.innerHTML = "";
-  [0,25,50,75,100].forEach(p=>{
-    const d = document.createElement("div"); d.className="tick"; d.style.left = p+"%";
-    d.innerHTML = `<label>${p}%</label>`;
-    ticksEl.appendChild(d);
-  });
-}
-function ringTo(circle, pct, dur=800){
-  const C = 2*Math.PI*52;
-  const from = Number(circle._pct || 0); const to = Math.max(0, Math.min(100, pct));
-  const t0 = performance.now();
-  function f(t){ const p = Math.min(1,(t-t0)/dur); const e = 1-Math.pow(1-p,3); const v = from + (to-from)*e;
-    const off = C * (1 - v/100); circle.style.strokeDashoffset = off; circle._pct = v; if(p<1) requestAnimationFrame(f);
-  } requestAnimationFrame(f);
-}
-
-/* ===== DATA ===== */
-let state = { data:null, idx:0 };
-
-async function fetchData(){
-  const r = await fetch(API_URL, { cache:"no-store" });
-  if(!r.ok) throw new Error("HTTP "+r.status);
-  return r.json();
-}
-function applyChallenge(ch){
-  const dGoal = Number(ch?.day?.ziel || 0);
-  const dIst  = Number(ch?.day?.ist  || 0);
-  const wGoal = Number(ch?.week?.ziel || 0);
-  const wIst  = Number(ch?.week?.ist  || 0);
-  const wPct  = Number(ch?.week?.progressPct || (wGoal>0? (wIst/wGoal)*100:0));
-  const dPct  = Number(ch?.day?.progressPct  || (dGoal>0? (dIst/dGoal)*100:0));
-
-  // Day
-  tween(document.getElementById("dayGoalBig"), dGoal, "num");
-  document.getElementById("dayIstPair").textContent  = fmtInt(dIst);
-  document.getElementById("dayGoalPair").textContent = fmtInt(dGoal);
-  document.getElementById("dayFill").style.width = Math.max(0, Math.min(100, dPct)) + "%";
-  buildDayTicks();
-
-  // Week
-  ringTo(document.getElementById("ringProgress"), wPct);
-  tween(document.getElementById("weekPct"), wPct, "pct");
-  document.getElementById("weekIstBig").textContent  = fmtDE(wIst);
-  document.getElementById("weekGoalBig").textContent = fmtDE(wGoal);
-}
-function updateUI(payload){
-  state.data = payload;
-  document.getElementById("updatedAt").textContent =
-    "Aktualisiert: " + new Date(payload.updatedAt || Date.now()).toLocaleString("de-DE");
-
-  const sel = document.getElementById("challengeSelect");
-  sel.innerHTML = "";
-  (payload.challenges||[]).forEach((c,i)=>{
-    const opt = document.createElement("option");
-    opt.value = String(i);
-    opt.textContent = c.title || ("Challenge "+(i+1));
-    sel.appendChild(opt);
-  });
-  if ((payload.challenges||[]).length){
-    if (state.idx >= payload.challenges.length) state.idx = 0;
-    sel.value = String(state.idx);
-    applyChallenge(payload.challenges[state.idx]);
-  }
-
-  buildList(document.getElementById("dayList"),  payload.day  || []);
-  buildList(document.getElementById("weekList"), payload.week || []);
-}
-
-/* ===== AUTH (Page) ===== */
 function saveWithTTL(key, val, ttlMs){ localStorage.setItem(key, JSON.stringify({v:val, t:Date.now(), ttl:ttlMs})); }
 function loadWithTTL(key){
   const raw = localStorage.getItem(key); if(!raw) return null;
   try{ const o = JSON.parse(raw); if(Date.now()-o.t > (o.ttl||0)) { localStorage.removeItem(key); return null; } return o.v; }
   catch(_){ localStorage.removeItem(key); return null; }
 }
-(function pageAuth(){
-  const gate = document.getElementById("pageGate");
-  const app  = document.getElementById("appRoot");
-  function unlock(){ gate.style.display="none"; app.removeAttribute("aria-hidden"); }
-  const ok = loadWithTTL("rhodenburg_site", DAY_MS);
-  if(ok === true){ unlock(); return; }
-  document.getElementById("siteBtn").addEventListener("click", ()=>{
-    const v = (document.getElementById("sitePwd").value||"").trim();
-    if(v === SITE_PWD){ saveWithTTL("rhodenburg_site", true, DAY_MS); unlock(); init(); }
-    else alert("Falsches Passwort.");
+
+/* ---------- SITE AUTH (Rhodenburg) ---------- */
+(function siteAuth(){
+  const DAY_MS = 24*60*60*1000;
+  const SITE_PWD = "Rhodenburg";
+  const modal  = document.getElementById("siteModal");
+  const inp    = document.getElementById("sitePwdInput");
+  const btnOk  = document.getElementById("siteOkBtn");
+
+  function open(){ modal.style.display = "grid"; setTimeout(()=> inp.focus(), 30); }
+  function close(){ modal.style.display = "none"; }
+
+  const ok = loadWithTTL("rhodenburg_site") === true;
+  if (!ok) open();
+
+  btnOk.addEventListener("click", ()=>{
+    if ((inp.value||"").trim() === SITE_PWD){
+      saveWithTTL("rhodenburg_site", true, DAY_MS);
+      close();
+    } else { alert("Falsches Passwort."); inp.focus(); }
   });
+  inp.addEventListener("keydown", e => { if(e.key === "Enter") btnOk.click(); });
 })();
 
-/* ===== AUTH (Rankings) ===== */
-function unlockRankings(){
-  const ol = document.getElementById("lockRank");
-  ol.style.display="none";
-}
-(function rankAuthInit(){
-  const saved = loadWithTTL("rhodenburg_rank", DAY_MS);
-  const ol = document.getElementById("lockRank");
-  // Clone overlay into both panels visually:
-  const rankW = document.getElementById("rankWPanel");
-  const clone = ol.cloneNode(true);
-  rankW.appendChild(clone);
+/* ---------- RANK AUTH (tap → modal) ---------- */
+(function rankAuthTapModal(){
+  const DAY_MS = 24*60*60*1000;
+  const RANK_PWD = "Rhodenburg1234";
 
-  function hideBoth(){
-    ol.style.display="none";
-    clone.style.display="none";
+  const covers = Array.from(document.querySelectorAll('.tapCover[data-panel="rank"]'));
+  const modal  = document.getElementById("rankModal");
+  const inp    = document.getElementById("rankPwdInput");
+  const btnOk  = document.getElementById("rankOkBtn");
+  const btnNo  = document.getElementById("rankCancelBtn");
+
+  function isUnlocked(){ return loadWithTTL("rhodenburg_rank") === true; }
+  function hideCovers(){ covers.forEach(c => c.style.display = "none"); }
+  function showCovers(){ covers.forEach(c => c.style.display = "grid"); }
+
+  function openModal(){
+    modal.style.display = "grid";
+    inp.value = "";
+    setTimeout(()=> inp.focus(), 30);
   }
+  function closeModal(){ modal.style.display = "none"; }
 
-  function wire(overlay){
-    const btn = overlay.querySelector("button");
-    const inp = overlay.querySelector("input");
-    btn.addEventListener("click", ()=>{
-      if((inp.value||"").trim() === RANK_PWD){ saveWithTTL("rhodenburg_rank", true, DAY_MS); hideBoth(); }
-      else alert("Falsches Passwort.");
-    });
-    inp.addEventListener("keydown", e=>{ if(e.key==="Enter") btn.click(); });
-  }
-  wire(ol); wire(clone);
+  if (isUnlocked()) hideCovers(); else showCovers();
+  covers.forEach(c => c.addEventListener("click", openModal));
 
-  if(saved === true) hideBoth();
+  btnOk.addEventListener("click", ()=>{
+    const v = (inp.value||"").trim();
+    if (v === RANK_PWD){
+      saveWithTTL("rhodenburg_rank", true, DAY_MS);
+      hideCovers(); closeModal();
+    } else { alert("Falsches Passwort."); inp.focus(); }
+  });
+  btnNo && btnNo.addEventListener("click", closeModal);
+  inp.addEventListener("keydown", e => { if(e.key === "Enter") btnOk.click(); });
+  modal.addEventListener("click", (e)=>{ if(e.target === modal) closeModal(); });
 })();
 
-/* ===== INIT ===== */
-function init(){
-  const sel = document.getElementById("challengeSelect");
-  sel.addEventListener("change", (e)=>{ state.idx = Number(e.target.value||0); if (state.data?.challenges) applyChallenge(state.data.challenges[state.idx]); });
-  // Erstes Rendering
-  updateUI({updatedAt:Date.now(), day:[], week:[], challenges:[]});
-  // Live-Daten
-  fetchData().then(updateUI).catch(console.error);
-  setInterval(async()=>{ try{ updateUI(await fetchData()) }catch(e){} }, POLL_MS);
+/* ---------- DATA & RENDER ---------- */
+const $ = sel => document.querySelector(sel);
+const dayFill = $("#dayFill");
+const weekArc = $("#weekArc");
+
+function setUpdated(ts){
+  try{
+    const d = new Date(ts);
+    $("#updatedAt").textContent = d.toLocaleString('de-DE');
+  }catch(_){ $("#updatedAt").textContent = ts || "—"; }
 }
-// Falls Page-Auth bereits aktiv war (aus localStorage), sofort init
-if(localStorage.getItem("rhodenburg_site")) { const ok = loadWithTTL("rhodenburg_site", DAY_MS); if(ok===true){ document.getElementById("pageGate").style.display="none"; document.getElementById("appRoot").removeAttribute("aria-hidden"); init(); } }
+
+function fmtStars(n){ return Number(n||0).toLocaleString('de-DE'); }
+
+function countTo(el, target, ms=500){
+  const start = Number(el.textContent.replace(/\D/g,""))||0;
+  const t0 = performance.now();
+  function frame(t){
+    const p = Math.min(1, (t - t0)/ms);
+    const val = Math.round(start + (target - start)*p);
+    el.textContent = fmtStars(val);
+    if (p<1) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+function setDay(goal, ist){
+  const pct = goal>0 ? Math.max(0, Math.min(100, (ist/goal)*100)) : 0;
+  dayFill.style.width = pct.toFixed(2) + "%";
+  $("#dayGoal").textContent = fmtStars(goal);
+  countTo($("#dayIst"), Math.round(ist));
+  $("#dayZiel").textContent = fmtStars(goal);
+}
+
+function setWeek(goal, ist){
+  const circ = 2*Math.PI*42; // dasharray 264 in SVG
+  const pct = goal>0 ? Math.max(0, Math.min(100, (ist/goal)*100)) : 0;
+  const off = circ * (1 - pct/100);
+  weekArc.setAttribute("stroke-dasharray", String(circ));
+  weekArc.setAttribute("stroke-dashoffset", String(off));
+  $("#weekPct").textContent = Math.round(pct) + "%";
+  countTo($("#weekIst"), Math.round(ist));
+  $("#weekZiel").textContent = fmtStars(goal);
+}
+
+function makeItem(i, name, stars){
+  const badgeClass = i===1?'gold': i===2?'silver': i===3?'bronze':'';
+  const div = document.createElement('div');
+  div.className = 'item';
+  div.innerHTML = `
+    <div class="rankNum"><div class="badge ${badgeClass}"></div><div>#${i}</div></div>
+    <div class="name">${name}</div>
+    <div class="score">${fmtStars(stars)} <span class="star"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l2.7 5.7 6.3.9-4.6 4.5 1.1 6.4-5.6-3-5.6 3 1.1-6.4L3 8.6l6.3-.9L12 2z" fill="#6dd3ff"/></svg></span></div>`;
+  return div;
+}
+
+function renderRanking(listEl, arr){
+  listEl.innerHTML = "";
+  arr.slice(0,20).forEach((r,idx)=> listEl.appendChild(makeItem(r.rank ?? (idx+1), r.name, r.stars)));
+}
+
+let state = { data:null, currentChallengeIndex:0 };
+
+async function fetchData(){
+  const res = await fetch(API_URL, {cache:'no-store'});
+  const data = await res.json();
+  return data;
+}
+
+function populateChallengeSelect(challenges){
+  const sel = $("#challengeSelect");
+  sel.innerHTML = "";
+  challenges.forEach((c,i)=>{
+    const opt = document.createElement('option');
+    opt.value = i; opt.textContent = (c.title || `Challenge ${i+1}`);
+    sel.appendChild(opt);
+  });
+  sel.value = String(state.currentChallengeIndex || 0);
+}
+
+function applyData(data){
+  setUpdated(data.updatedAt || new Date().toISOString());
+
+  // Rankings
+  renderRanking($("#dayList"),  data.day  || []);
+  renderRanking($("#weekList"), data.week || []);
+
+  // Challenges
+  const ch = data.challenges || [];
+  if (ch.length){
+    populateChallengeSelect(ch);
+    const idx = Math.min(state.currentChallengeIndex || 0, ch.length-1);
+    const cur = ch[idx];
+
+    // Day
+    const dGoal = Math.round(cur.day?.ziel || 0);
+    const dIst  = Math.round(cur.day?.ist  || 0);
+    setDay(dGoal, dIst);
+
+    // Week
+    const wGoal = Math.round(cur.week?.ziel || 0);
+    const wIst  = Math.round(cur.week?.ist  || 0);
+    setWeek(wGoal, wIst);
+  }
+}
+
+$("#challengeSelect").addEventListener("change", (e)=>{
+  state.currentChallengeIndex = parseInt(e.target.value,10) || 0;
+  if (state.data) applyData(state.data);
+});
+
+async function refresh(){
+  try{
+    const d = await fetchData();
+    state.data = d;
+    applyData(d);
+  }catch(e){
+    console.error("Fetch/Render error", e);
+  }finally{
+    setTimeout(refresh, REFRESH_MS);
+  }
+}
+
+// Start
+refresh();
 </script>
 </body>
 </html>
