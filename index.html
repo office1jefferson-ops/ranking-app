@@ -59,7 +59,8 @@
     grid-template-columns: 1fr 1fr;
     grid-template-areas:
       "day week"
-      "rankD rankW";
+      "rankD rankW"
+      "video video";
   }
   .panel{
     background:linear-gradient(180deg, var(--panel2), var(--panel));
@@ -80,13 +81,10 @@
     box-shadow:0 0 10px rgba(255,77,109,.45);
   }
 
-  /* — Balken exakt von Zahl (links) bis LIVE (rechts), mit mehr vertikalem Abstand — */
+  /* Balken exakt zwischen Zahl (links) und LIVE (rechts), mit mehr vertikalem Abstand */
   .barWrap{
-    margin-top:14px;               /* mehr Abstand oben */
-    margin-bottom:14px;            /* mehr Abstand unten */
-    height:10px;
-    position:relative;             /* bleibt im normalen Flow */
-    width:auto;                    /* Breite wird per JS gesetzt (auto + MarginRight) */
+    margin-top:14px; margin-bottom:14px;
+    height:10px; position:relative; width:auto;
   }
   .bar{
     position:relative; height:10px; border-radius:999px; overflow:hidden;
@@ -100,7 +98,7 @@
     transition: width .7s cubic-bezier(.2,.8,.2,1);
   }
 
-  /* Ticks: Labels gleich, Linien dünner & kürzer; 0% wird nicht erzeugt */
+  /* Ticks: 25/50/75/100%; 0% ausgeblendet */
   .ticks{position:relative; height:0; margin-top:6px}
   .tick{position:absolute; top:-5px; width:2px; height:16px; background:#3a5a95; border-radius:2px}
   .tick label{position:absolute; top:16px; transform:translateX(-50%); color:var(--muted); font-size:9px; font-weight:900; white-space:nowrap}
@@ -148,7 +146,7 @@
   .stars{display:flex; align-items:center; gap:6px; font-variant-numeric:tabular-nums}
   .sstar{width:14px;height:14px;filter: drop-shadow(0 0 6px rgba(106,182,255,.8))}
 
-  /* Schloss-Icons (pro Panel), nur EIN gemeinsames Modal */
+  /* Schloss-Icons (pro Panel), ein gemeinsames Modal */
   .lockOverlay{
     position:absolute; inset:0;
     background:#0b0f17; border:none; border-radius:16px;
@@ -158,7 +156,7 @@
   .lockIcon svg{ width:40px; height:40px; display:block; max-width:12vw; max-height:12vw; filter: drop-shadow(0 0 8px rgba(154,209,255,.22)); }
   .lockIcon small{ color:var(--muted); letter-spacing:.15px; font-weight:800; text-transform:uppercase; font-size:10px }
 
-  /* Gemeinsames Passwort-Modal (zentriert über BEIDE Rankings) */
+  /* Gemeinsames Passwort-Modal (zentriert) */
   .rankLockModal{
     position:fixed; inset:0; display:none; place-items:center;
     background:linear-gradient(180deg, rgba(7,11,20,.86), rgba(7,11,20,.86));
@@ -177,6 +175,20 @@
     padding:8px 10px; border-radius:9px; font-weight:900; cursor:pointer;
   }
 
+  /* Video Panel */
+  .video{ grid-area:video; }
+  .panelHeader{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .videoToggle{
+    background:linear-gradient(180deg,#123361,#0b2244);
+    color:#cfe3ff; border:1px solid #28508a; padding:6px 10px;
+    border-radius:9px; font-weight:800; cursor:pointer;
+  }
+  .videoWrap{
+    position:relative; padding-top:56.25%; border-radius:16px; overflow:hidden;
+    box-shadow:var(--glow); border:1px solid var(--line);
+  }
+  .videoWrap iframe{ position:absolute; top:0; left:0; width:100%; height:100%; }
+
   /* Page gate */
   .pageGate{
     position:fixed; inset:0; display:grid; place-items:center; background:radial-gradient(1200px 800px at 50% 15%, #111c33, #070b14 60%);
@@ -184,20 +196,10 @@
   }
 
   /* Responsive */
-  @media (max-width: 1100px){
-    .gauge{ grid-template-columns: 150px 1fr }
-    .ring{ width:150px; min-width:150px }
-  }
   @media (max-width: 900px){
-    .grid{ grid-template-columns: 1fr; grid-template-areas: "day" "week" "rankD" "rankW"; }
+    .grid{ grid-template-columns: 1fr; grid-template-areas: "day" "week" "rankD" "rankW" "video"; }
     .list{ max-height:40vh }
-    .selector{ justify-self:center }
-    .updated{ justify-self:center }
-  }
-  @media (max-width: 620px){
-    .gauge{ grid-template-columns: 1fr; }
-    .ring{ justify-self:center }
-    .weekPair{ justify-content:center; text-align:center }
+    .selector,.updated{ justify-self:center }
   }
 </style>
 </head>
@@ -247,7 +249,6 @@
         <span class="badgeLive" id="badgeLive">LIVE</span>
       </div>
 
-      <!-- Balken exakt zwischen Zahl (links) und LIVE (rechts) -->
       <div class="barWrap" id="barWrap">
         <div class="bar"><div class="fill" id="dayFill"></div></div>
         <div class="ticks" id="dayTicks"></div>
@@ -323,6 +324,22 @@
         </div>
       </div>
     </section>
+
+    <!-- VIDEO (ein-/ausblendbar) -->
+    <section class="panel video" id="videoPanel">
+      <div class="panelHeader">
+        <h2>Team Video</h2>
+        <button class="videoToggle" id="videoToggleBtn">Video ausblenden</button>
+      </div>
+      <div id="videoPanelBody">
+        <div class="videoWrap">
+          <iframe 
+            src="https://vimeo.com/1131985527"
+            frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen>
+          </iframe>
+        </div>
+      </div>
+    </section>
   </div>
 </div>
 
@@ -363,7 +380,7 @@ function buildList(el, items){
   });
 }
 
-/* Ticks: 0% entfernt; 25/50/75/100% */
+/* Ticks */
 function buildDayTicks(){
   const ticksEl = document.getElementById("dayTicks"); ticksEl.innerHTML = "";
   [25,50,75,100].forEach(p=>{
@@ -383,11 +400,7 @@ function ringTo(circle, pct, dur=800){
   } requestAnimationFrame(f);
 }
 
-/* ===== Balken exakt spannen und mittig ausrichten =====
-   - Linke Kante = Start der Zahl
-   - Rechte Kante = Ende des LIVE-Badges
-   -> Kein "Blockieren" mehr links, weil wir nicht skaliert, sondern exakt spannen.
-*/
+/* Tages-Balken exakt spannen und mittig ausrichten */
 function alignDayBar(){
   const day = document.getElementById('dayPanel');
   const num = document.getElementById('dayGoalBig');
@@ -399,14 +412,21 @@ function alignDayBar(){
   const rNum  = num.getBoundingClientRect();
   const rLive = live.getBoundingClientRect();
 
-  // Exakte Ränder zwischen Zahl (links) und LIVE (rechts)
   const leftInset  = Math.max(0, rNum.left  - rDay.left);
   const rightInset = Math.max(0, rDay.right - rLive.right);
 
-  // Setze linke/rechte "Ränder" über Margins – so bleibt das Element im Flow
   barWrap.style.marginLeft  = leftInset + 'px';
   barWrap.style.marginRight = rightInset + 'px';
-  barWrap.style.width = 'auto'; // Breite aus den Margins ableiten
+  barWrap.style.width = 'auto';
+}
+
+/* ===== STATE/DATA ===== */
+window.state = { data:null, idx:0 };
+
+async function fetchData(){
+  const r = await fetch(API_URL, { cache:"no-store" });
+  if(!r.ok) throw new Error("HTTP "+r.status);
+  return r.json();
 }
 
 function applyChallenge(ch){
@@ -433,6 +453,7 @@ function applyChallenge(ch){
 }
 
 function updateUI(payload){
+  window.state.data = payload;
   document.getElementById("updatedAt").textContent =
     "Aktualisiert: " + new Date(payload.updatedAt || Date.now()).toLocaleString("de-DE");
 
@@ -444,7 +465,6 @@ function updateUI(payload){
     opt.textContent = c.title || ("Challenge "+(i+1));
     sel.appendChild(opt);
   });
-
   if ((payload.challenges||[]).length){
     if (window.state.idx >= payload.challenges.length) window.state.idx = 0;
     sel.value = String(window.state.idx);
@@ -454,15 +474,6 @@ function updateUI(payload){
   buildList(document.getElementById("dayList"),  payload.day  || []);
   buildList(document.getElementById("weekList"), payload.week || []);
   alignDayBar();
-}
-
-/* ===== STATE/DATA ===== */
-window.state = { data:null, idx:0 };
-
-async function fetchData(){
-  const r = await fetch(API_URL, { cache:"no-store" });
-  if(!r.ok) throw new Error("HTTP "+r.status);
-  return r.json();
 }
 
 /* ===== AUTH (Page) ===== */
@@ -527,6 +538,20 @@ function unlockRankings(){
   if(saved === true) unlockRankings();
 })();
 
+/* ===== Video Toggle (persistiert in localStorage) ===== */
+function initVideoToggle(){
+  const btn = document.getElementById('videoToggleBtn');
+  const body = document.getElementById('videoPanelBody');
+  const KEY = 'rhodenburg_video_visible';
+  function setVisible(v){
+    if(v){ body.style.display='block'; btn.textContent='Video ausblenden'; localStorage.setItem(KEY,'1'); }
+    else { body.style.display='none';  btn.textContent='Video anzeigen';  localStorage.setItem(KEY,'0'); }
+  }
+  const saved = localStorage.getItem(KEY);
+  setVisible(saved !== '0'); // default sichtbar
+  btn.addEventListener('click', ()=> setVisible(body.style.display==='none'));
+}
+
 /* ===== INIT ===== */
 function init(){
   const sel = document.getElementById("challengeSelect");
@@ -550,6 +575,9 @@ function init(){
 
   // Re-Align on resize
   window.addEventListener('resize', alignDayBar);
+
+  // Video Toggle
+  initVideoToggle();
 }
 
 // Falls Page-Auth bereits aktiv war
