@@ -81,11 +81,8 @@
     box-shadow:0 0 10px rgba(255,77,109,.45);
   }
 
-  /* Balken exakt zwischen Zahl (links) und LIVE (rechts), mit mehr vertikalem Abstand */
-  .barWrap{
-    margin-top:14px; margin-bottom:14px;
-    height:10px; position:relative; width:auto;
-  }
+  /* Balken exakt zwischen Zahl (links) und LIVE (rechts) */
+  .barWrap{ margin-top:14px; margin-bottom:14px; height:10px; position:relative; width:auto; }
   .bar{
     position:relative; height:10px; border-radius:999px; overflow:hidden;
     background:linear-gradient(180deg, #0c1323, #0a1120); border:1px solid var(--line);
@@ -98,7 +95,7 @@
     transition: width .7s cubic-bezier(.2,.8,.2,1);
   }
 
-  /* Ticks: 25/50/75/100%; 0% ausgeblendet */
+  /* Ticks */
   .ticks{position:relative; height:0; margin-top:6px}
   .tick{position:absolute; top:-5px; width:2px; height:16px; background:#3a5a95; border-radius:2px}
   .tick label{position:absolute; top:16px; transform:translateX(-50%); color:var(--muted); font-size:9px; font-weight:900; white-space:nowrap}
@@ -154,12 +151,18 @@
     color:#cfe3ff; border:1px solid #28508a; padding:6px 10px;
     border-radius:9px; font-weight:800; cursor:pointer;
   }
-  .videoBody{ display:none; margin-top:14px; } /* Start: ausgeblendet + mehr Abstand */
+  .videoBody{ display:none; margin-top:14px; }
   .videoWrap{
     position:relative; padding-top:56.25%; border-radius:16px; overflow:hidden;
     box-shadow:var(--glow); border:1px solid var(--line);
   }
   .videoWrap iframe{ position:absolute; top:0; left:0; width:100%; height:100%; }
+
+  /* Mehrere Video-Blöcke */
+  .videoBlock{ display:grid; gap:8px; margin-top:14px; }
+  .videoBlock h3{ margin:0; font-size:12px; color:var(--muted); letter-spacing:.2px; text-transform:uppercase; }
+  .videoGrid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width: 900px){ .videoGrid{ grid-template-columns:1fr; } }
 
   /* Schloss / Modals */
   .lockOverlay{
@@ -325,18 +328,63 @@
       </div>
     </section>
 
-    <!-- VIDEO (Start: ausgeblendet) -->
+    <!-- VIDEOS (jetzt 5 Abschnitte: oben "Aktuell" mit 2 Videos) -->
     <section class="panel video" id="videoPanel">
       <div class="panelHeader">
-        <h2>Team Video</h2>
-        <button class="videoToggle" id="videoToggleBtn">Video anzeigen</button>
+        <h2>Videos</h2>
+        <button class="videoToggle" id="videoToggleBtn">Videos ausklappen</button>
       </div>
       <div class="videoBody" id="videoPanelBody">
-        <div class="videoWrap">
-          <iframe 
-            src="https://player.vimeo.com/video/1131985527?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
-            frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen>
-          </iframe>
+        <!-- Aktuell: 2 Videos nebeneinander -->
+        <div class="videoBlock">
+          <h3>Aktuell</h3>
+          <div class="videoGrid">
+            <div class="videoWrap">
+              <iframe 
+                src="https://player.vimeo.com/video/1131998437?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
+                frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen>
+              </iframe>
+            </div>
+            <div class="videoWrap">
+              <iframe 
+                src="https://player.vimeo.com/video/1131985527?badge=0&autopause=0&player_id=0&app_id=58479"
+                frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen>
+              </iframe>
+            </div>
+          </div>
+        </div>
+
+        <!-- My Easy Job -->
+        <div class="videoBlock">
+          <h3>My Easy Job</h3>
+          <div class="videoWrap">
+            <iframe 
+              src="https://player.vimeo.com/video/1131985527?badge=0&autopause=0&player_id=0&app_id=58479"
+              frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen>
+            </iframe>
+          </div>
+        </div>
+
+        <!-- Money Prime -->
+        <div class="videoBlock">
+          <h3>Money Prime</h3>
+          <div class="videoWrap">
+            <iframe 
+              src="https://player.vimeo.com/video/1130609482?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
+              frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen>
+            </iframe>
+          </div>
+        </div>
+
+        <!-- RB Aktiengesellschaft Trailer -->
+        <div class="videoBlock">
+          <h3>RB Aktiengesellschaft Trailer</h3>
+          <div class="videoWrap">
+            <iframe 
+              src="https://player.vimeo.com/video/1131985527?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
+              frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen>
+            </iframe>
+          </div>
         </div>
       </div>
     </section>
@@ -551,13 +599,13 @@ function unlockRankings(){
   if(saved === true) unlockRankings();
 })();
 
-/* ===== Video Toggle (Start: versteckt, kein Persist) ===== */
+/* ===== Video Toggle (Start: versteckt) ===== */
 (function initVideoToggle(){
   const btn = document.getElementById('videoToggleBtn');
   const body = document.getElementById('videoPanelBody');
   function setVisible(v){
     body.style.display = v ? 'block' : 'none';
-    btn.textContent = v ? 'Video ausblenden' : 'Video anzeigen';
+    btn.textContent = v ? 'Videos einklappen' : 'Videos ausklappen';
   }
   setVisible(false); // Startzustand: ausgeblendet
   btn.addEventListener('click', ()=> setVisible(body.style.display === 'none'));
