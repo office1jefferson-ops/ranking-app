@@ -49,8 +49,7 @@
   }
   .selector span{color:var(--muted); font-weight:700; letter-spacing:.15px; font-size:12px}
   .selector select{
-    appearance:none; border:1px solid var(--line); background:#0e1628; color:#0ee;
-    color:var(--text);
+    appearance:none; border:1px solid var(--line); background:#0e1628; color:var(--text);
     padding:6px 8px; border-radius:9px; font-weight:800; min-width:150px; text-align:center; font-size:12px;
   }
 
@@ -80,9 +79,11 @@
     background:#e33; color:#fff; font-weight:900; padding:4px 8px; border-radius:9px; letter-spacing:.35px; font-size:11px;
     box-shadow:0 0 10px rgba(255,77,109,.45);
   }
-  .barWrap{ margin-top:10px }
+
+  /* — Balken dünner & etwas kürzer — */
+  .barWrap{ margin-top:8px; max-width:88%; margin-left:auto; margin-right:auto; }
   .bar{
-    position:relative; height:14px; border-radius:999px; overflow:hidden;
+    position:relative; height:10px; border-radius:999px; overflow:hidden;
     background:linear-gradient(180deg, #0c1323, #0a1120); border:1px solid var(--line);
   }
   .bar .fill{
@@ -91,10 +92,12 @@
     box-shadow:0 0 16px rgba(154,209,255,.5);
     transition: width .7s cubic-bezier(.2,.8,.2,1);
   }
-  .ticks{position:relative; height:0; margin-top:10px}
-  /* — Ticks dicker, Labels kleiner & fett — */
-  .tick{position:absolute; top:-7px; width:3px; height:26px; background:#3a5a95; border-radius:3px}
-  .tick label{position:absolute; top:26px; transform:translateX(-50%); color:var(--muted); font-size:10px; font-weight:900; white-space:nowrap}
+
+  .ticks{position:relative; height:0; margin-top:8px}
+  /* Ticks dicker, aber Labels noch kleiner */
+  .tick{position:absolute; top:-7px; width:3px; height:22px; background:#3a5a95; border-radius:3px}
+  .tick label{position:absolute; top:22px; transform:translateX(-50%); color:var(--muted); font-size:9px; font-weight:900; white-space:nowrap}
+
   .pair{ margin-top:6px; color:var(--muted); display:flex; gap:6px; flex-wrap:wrap; font-weight:700; font-size:12px; }
   .pair strong{color:var(--text)}
 
@@ -155,18 +158,17 @@
   }
   .lockCard h3{ margin:0; font-size:14px; color:var(--muted); text-transform:uppercase; letter-spacing:.2px }
   .lockCard input{
-    background:#0b1324; color:var(--text); border:1px solid var(--line); border-radius:9px; padding:8px; text-align:center; font-weight:800;
+    background:#0b1324; color:#fff; border:1px solid var(--line); border-radius:9px; padding:8px; text-align:center; font-weight:800;
   }
   .lockCard button{
     background:linear-gradient(180deg,#123361,#0b2244); color:#cfe3ff; border:1px solid #28508a;
     padding:8px 10px; border-radius:9px; font-weight:900; cursor:pointer;
   }
-  .lockIcon{
-    display:grid; place-items:center; gap:8px; text-align:center;
-    opacity:.9; user-select:none;
-  }
-  .lockIcon svg{ width:54px; height:54px; display:block; filter: drop-shadow(0 0 10px rgba(154,209,255,.25)); }
-  .lockIcon small{ color:var(--muted); letter-spacing:.15px; font-weight:800; text-transform:uppercase }
+
+  /* — Schloss kleiner & responsiv — */
+  .lockIcon{ display:grid; place-items:center; gap:6px; text-align:center; opacity:.9; user-select:none; }
+  .lockIcon svg{ width:40px; height:40px; display:block; max-width:12vw; max-height:12vw; filter: drop-shadow(0 0 8px rgba(154,209,255,.22)); }
+  .lockIcon small{ color:var(--muted); letter-spacing:.15px; font-weight:800; text-transform:uppercase; font-size:10px }
 
   /* Page gate */
   .pageGate{
