@@ -146,17 +146,31 @@
   .stars{display:flex; align-items:center; gap:6px; font-variant-numeric:tabular-nums}
   .sstar{width:14px;height:14px;filter: drop-shadow(0 0 6px rgba(106,182,255,.8))}
 
-  /* Schloss-Icons (pro Panel), ein gemeinsames Modal */
+  /* Video Panel */
+  .video{ grid-area:video; }
+  .panelHeader{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .videoToggle{
+    background:linear-gradient(180deg,#123361,#0b2244);
+    color:#cfe3ff; border:1px solid #28508a; padding:6px 10px;
+    border-radius:9px; font-weight:800; cursor:pointer;
+  }
+  .videoBody{ display:none; margin-top:14px; } /* Start: ausgeblendet + mehr Abstand */
+  .videoWrap{
+    position:relative; padding-top:56.25%; border-radius:16px; overflow:hidden;
+    box-shadow:var(--glow); border:1px solid var(--line);
+  }
+  .videoWrap iframe{ position:absolute; top:0; left:0; width:100%; height:100%; }
+
+  /* Schloss / Modals */
   .lockOverlay{
     position:absolute; inset:0;
     background:#0b0f17; border:none; border-radius:16px;
     display:grid; place-items:center; z-index:4;
   }
   .lockIcon{ display:grid; place-items:center; gap:6px; text-align:center; opacity:.9; user-select:none; }
-  .lockIcon svg{ width:40px; height:40px; display:block; max-width:12vw; max-height:12vw; filter: drop-shadow(0 0 8px rgba(154,209,255,.22)); }
+  .lockIcon svg{ width:40px; height:40px; display:block; filter: drop-shadow(0 0 8px rgba(154,209,255,.22)); }
   .lockIcon small{ color:var(--muted); letter-spacing:.15px; font-weight:800; text-transform:uppercase; font-size:10px }
 
-  /* Gemeinsames Passwort-Modal (zentriert) */
   .rankLockModal{
     position:fixed; inset:0; display:none; place-items:center;
     background:linear-gradient(180deg, rgba(7,11,20,.86), rgba(7,11,20,.86));
@@ -174,20 +188,6 @@
     background:linear-gradient(180deg,#123361,#0b2244); color:#cfe3ff; border:1px solid #28508a;
     padding:8px 10px; border-radius:9px; font-weight:900; cursor:pointer;
   }
-
-  /* Video Panel */
-  .video{ grid-area:video; }
-  .panelHeader{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
-  .videoToggle{
-    background:linear-gradient(180deg,#123361,#0b2244);
-    color:#cfe3ff; border:1px solid #28508a; padding:6px 10px;
-    border-radius:9px; font-weight:800; cursor:pointer;
-  }
-  .videoWrap{
-    position:relative; padding-top:56.25%; border-radius:16px; overflow:hidden;
-    box-shadow:var(--glow); border:1px solid var(--line);
-  }
-  .videoWrap iframe{ position:absolute; top:0; left:0; width:100%; height:100%; }
 
   /* Page gate */
   .pageGate{
@@ -325,16 +325,16 @@
       </div>
     </section>
 
-    <!-- VIDEO (ein-/ausblendbar) -->
+    <!-- VIDEO (Start: ausgeblendet) -->
     <section class="panel video" id="videoPanel">
       <div class="panelHeader">
         <h2>Team Video</h2>
-        <button class="videoToggle" id="videoToggleBtn">Video ausblenden</button>
+        <button class="videoToggle" id="videoToggleBtn">Video anzeigen</button>
       </div>
-      <div id="videoPanelBody">
+      <div class="videoBody" id="videoPanelBody">
         <div class="videoWrap">
           <iframe 
-            src="https://player.vimeo.com/video/1131985527?title=0&amp;byline=0&amp;portrait=0&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
+            src="https://player.vimeo.com/video/1131985527?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
             frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen>
           </iframe>
         </div>
@@ -354,6 +354,19 @@ const DAY_MS = 24*60*60*1000;
 /* ===== HELPERS ===== */
 const fmtDE = (n, f=2)=> new Intl.NumberFormat("de-DE",{minimumFractionDigits:f,maximumFractionDigits:f}).format(Number(n||0));
 const fmtInt = n => new Intl.NumberFormat("de-DE",{maximumFractionDigits:0}).format(Number(n||0));
+
+/* Deutsche Zahlen robust parsen und mit 2 Nachkommastellen formatieren */
+function parseDE(n){
+  if (n == null) return 0;
+  if (typeof n === "number") return n;
+  const s = String(n).trim().replace(/\./g, "").replace(",", ".");
+  const v = parseFloat(s);
+  return isNaN(v) ? 0 : v;
+}
+function fmtDE2(n){
+  return new Intl.NumberFormat("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    .format(parseDE(n));
+}
 
 function tween(el, to, fmt="num", dur=600){
   const from = Number(el._v || 0); const diff = to - from; const t0 = performance.now();
@@ -375,7 +388,7 @@ function buildList(el, items){
     row.innerHTML = `
       <div class="medal ${i===0?"gold":i===1?"silver":i===2?"bronze":"steel"}">${i+1}</div>
       <div class="name truncate">${it.name}</div>
-      <div class="stars"><strong>${fmtInt(it.stars)}</strong> <img class="sstar" alt="★" src="${star16}"></div>`;
+      <div class="stars"><strong>${fmtDE2(it.stars)}</strong> <img class="sstar" alt="★" src="${star16}"></div>`;
     el.appendChild(row);
   });
 }
@@ -538,19 +551,17 @@ function unlockRankings(){
   if(saved === true) unlockRankings();
 })();
 
-/* ===== Video Toggle (persistiert in localStorage) ===== */
-function initVideoToggle(){
+/* ===== Video Toggle (Start: versteckt, kein Persist) ===== */
+(function initVideoToggle(){
   const btn = document.getElementById('videoToggleBtn');
   const body = document.getElementById('videoPanelBody');
-  const KEY = 'rhodenburg_video_visible';
   function setVisible(v){
-    if(v){ body.style.display='block'; btn.textContent='Video ausblenden'; localStorage.setItem(KEY,'1'); }
-    else { body.style.display='none';  btn.textContent='Video anzeigen';  localStorage.setItem(KEY,'0'); }
+    body.style.display = v ? 'block' : 'none';
+    btn.textContent = v ? 'Video ausblenden' : 'Video anzeigen';
   }
-  const saved = localStorage.getItem(KEY);
-  setVisible(saved !== '0'); // default sichtbar
-  btn.addEventListener('click', ()=> setVisible(body.style.display==='none'));
-}
+  setVisible(false); // Startzustand: ausgeblendet
+  btn.addEventListener('click', ()=> setVisible(body.style.display === 'none'));
+})();
 
 /* ===== INIT ===== */
 function init(){
@@ -575,9 +586,6 @@ function init(){
 
   // Re-Align on resize
   window.addEventListener('resize', alignDayBar);
-
-  // Video Toggle
-  initVideoToggle();
 }
 
 // Falls Page-Auth bereits aktiv war
