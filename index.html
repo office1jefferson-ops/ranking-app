@@ -263,7 +263,7 @@
         <img class="sstar" alt="★" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%2359a6ff' viewBox='0 0 24 24'><path d='M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.2l7.1-.6z'/></svg>">
         <span>/</span>
         <strong id="dayGoalPair">0</strong>
-        <img class="sstar" alt="★" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%239ad1ff' viewBox='0 0 24 24'><path d='M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.2l7.1-.6z'/></svg>">
+        <img class="sstar" alt="★" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%239ad1ff' viewBox='0 0 24 24'><path d='M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2 3.8 1.6-7L2 9.2l7.1-.6z'/></svg>">
       </div>
     </section>
 
@@ -501,8 +501,8 @@ function applyChallenge(ch){
 
   // Day
   tween(document.getElementById("dayGoalBig"), dGoal, "num");
-  document.getElementById("dayIstPair").textContent  = fmtInt(dIst);
-  document.getElementById("dayGoalPair").textContent = fmtInt(dGoal);
+  document.getElementById("dayIstPair").textContent  = fmtDE2(dIst);
+  document.getElementById("dayGoalPair").textContent = fmtDE2(dGoal);
   document.getElementById("dayFill").style.width = Math.max(0, Math.min(100, dPct)) + "%";
   buildDayTicks();
   alignDayBar();
