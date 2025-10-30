@@ -13,6 +13,7 @@
     --accent:#59a6ff; --accent2:#9ad1ff;
     --gold:#ffcc4d; --silver:#c7d2e1; --bronze:#d7a476; --steel:#7f8aa9;
     --glow: 0 0 22px rgba(89,166,255,.35);
+    --daybar-scale: 0.90; /* Zentrierte Balken-Länge relativ zum Abstand Zahl↔LIVE */
   }
   *{box-sizing:border-box}
   html,body{height:100%}
@@ -80,12 +81,8 @@
     box-shadow:0 0 10px rgba(255,77,109,.45);
   }
 
-  /* — Balken exakt von Zahl bis LIVE — */
-  .barWrap{
-    margin-top:8px;
-    height:10px;
-    position:relative;
-  }
+  /* — Balken: Position & Breite per JS, hier nur Optik — */
+  .barWrap{ margin-top:8px; height:10px; position:relative; }
   .bar{
     position:relative; height:10px; border-radius:999px; overflow:hidden;
     background:linear-gradient(180deg, #0c1323, #0a1120); border:1px solid var(--line);
@@ -98,7 +95,7 @@
     transition: width .7s cubic-bezier(.2,.8,.2,1);
   }
 
-  /* Ticks: gleiche Größe der Labels, aber Linien dünner & kürzer */
+  /* Ticks: Labels gleich, Linien dünner & kürzer */
   .ticks{position:relative; height:0; margin-top:6px}
   .tick{position:absolute; top:-5px; width:2px; height:16px; background:#3a5a95; border-radius:2px}
   .tick label{position:absolute; top:16px; transform:translateX(-50%); color:var(--muted); font-size:9px; font-weight:900; white-space:nowrap}
@@ -245,7 +242,7 @@
         <span class="badgeLive" id="badgeLive">LIVE</span>
       </div>
 
-      <!-- Balken passt sich per JS exakt an -->
+      <!-- Zentrierter Balken (Länge aus Abstand Zahl↔LIVE * --daybar-scale) -->
       <div class="barWrap" id="barWrap">
         <div class="bar"><div class="fill" id="dayFill"></div></div>
         <div class="ticks" id="dayTicks"></div>
@@ -381,7 +378,9 @@ function ringTo(circle, pct, dur=800){
   } requestAnimationFrame(f);
 }
 
-/* Tages-Balken exakt an Zahl(L) bis LIVE(R) anpassen */
+/* ===== Zentrierung Tages-Balken =====
+   Behält die (relative) Länge über --daybar-scale bei,
+   positioniert den Balken exakt mittig zwischen Zahl und LIVE. */
 function alignDayBar(){
   const day = document.getElementById('dayPanel');
   const num = document.getElementById('dayGoalBig');
@@ -389,24 +388,17 @@ function alignDayBar(){
   const barWrap = document.getElementById('barWrap');
   if(!day || !num || !live || !barWrap) return;
 
-  const rDay = day.getBoundingClientRect();
-  const rNum = num.getBoundingClientRect();
+  const rDay  = day.getBoundingClientRect();
+  const rNum  = num.getBoundingClientRect();
   const rLive = live.getBoundingClientRect();
 
-  const left = Math.max(0, rNum.left - rDay.left);
-  const width = Math.max(0, rLive.right - rNum.left);
+  const span = Math.max(0, rLive.right - rNum.left);                // Gesamtabstand Zahl↔LIVE
+  const scale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--daybar-scale')) || 1;
+  const desired = Math.round(span * Math.max(0.1, Math.min(1, scale))); // gewünschte Länge
 
-  barWrap.style.marginLeft = left + 'px';
-  barWrap.style.width = width + 'px';
-}
-
-/* ===== STATE/DATA ===== */
-let state = { data:null, idx:0 };
-
-async function fetchData(){
-  const r = await fetch(API_URL, { cache:"no-store" });
-  if(!r.ok) throw new Error("HTTP "+r.status);
-  return r.json();
+  const leftOffset = (rNum.left - rDay.left) + (span - desired) / 2; // zentriert
+  barWrap.style.width = desired + 'px';
+  barWrap.style.marginLeft = leftOffset + 'px';
 }
 
 function applyChallenge(ch){
@@ -433,7 +425,6 @@ function applyChallenge(ch){
 }
 
 function updateUI(payload){
-  state.data = payload;
   document.getElementById("updatedAt").textContent =
     "Aktualisiert: " + new Date(payload.updatedAt || Date.now()).toLocaleString("de-DE");
 
@@ -445,15 +436,25 @@ function updateUI(payload){
     opt.textContent = c.title || ("Challenge "+(i+1));
     sel.appendChild(opt);
   });
+
   if ((payload.challenges||[]).length){
-    if (state.idx >= payload.challenges.length) state.idx = 0;
-    sel.value = String(state.idx);
-    applyChallenge(payload.challenges[state.idx]);
+    if (window.state.idx >= payload.challenges.length) window.state.idx = 0;
+    sel.value = String(window.state.idx);
+    applyChallenge(payload.challenges[window.state.idx]);
   }
 
   buildList(document.getElementById("dayList"),  payload.day  || []);
   buildList(document.getElementById("weekList"), payload.week || []);
   alignDayBar();
+}
+
+/* ===== STATE/DATA ===== */
+window.state = { data:null, idx:0 };
+
+async function fetchData(){
+  const r = await fetch(API_URL, { cache:"no-store" });
+  if(!r.ok) throw new Error("HTTP "+r.status);
+  return r.json();
 }
 
 /* ===== AUTH (Page) ===== */
@@ -500,7 +501,7 @@ function unlockRankings(){
   const inp = document.getElementById("rankPwd");
   const modal = document.getElementById("rankLockModal");
 
-  function clickHandler(e){
+  function clickHandler(){
     if(dayOv.style.display !== "none" || weekOv.style.display !== "none"){
       showRankModal();
     }
@@ -521,14 +522,23 @@ function unlockRankings(){
 /* ===== INIT ===== */
 function init(){
   const sel = document.getElementById("challengeSelect");
-  sel.addEventListener("change", (e)=>{ state.idx = Number(e.target.value||0); if (state.data?.challenges) applyChallenge(state.data.challenges[state.idx]); });
+  sel.addEventListener("change", (e)=>{
+    window.state.idx = Number(e.target.value||0);
+    if (window.state.data?.challenges) applyChallenge(window.state.data.challenges[window.state.idx]);
+  });
 
   // Erstes Rendering
   updateUI({updatedAt:Date.now(), day:[], week:[], challenges:[]});
 
   // Live-Daten
-  fetchData().then(updateUI).catch(console.error);
-  setInterval(async()=>{ try{ updateUI(await fetchData()) }catch(e){} }, POLL_MS);
+  fetchData().then(d=>{ window.state.data=d; updateUI(d); }).catch(console.error);
+  setInterval(async()=>{
+    try{
+      const d = await fetchData();
+      window.state.data = d;
+      updateUI(d);
+    }catch(e){}
+  }, POLL_MS);
 
   // Re-Align on resize
   window.addEventListener('resize', alignDayBar);
