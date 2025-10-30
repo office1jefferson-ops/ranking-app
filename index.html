@@ -49,7 +49,7 @@
   }
   .selector span{color:var(--muted); font-weight:700; letter-spacing:.15px; font-size:12px}
   .selector select{
-    appearance:none; border:1px solid var(--line); background:#0e1628; color:var(--text);
+    appearance:none; border:1px solid var(--line); background:#0e1628; color:#fff;
     padding:6px 8px; border-radius:9px; font-weight:800; min-width:150px; text-align:center; font-size:12px;
   }
 
@@ -80,11 +80,16 @@
     box-shadow:0 0 10px rgba(255,77,109,.45);
   }
 
-  /* — Balken dünner & etwas kürzer — */
-  .barWrap{ margin-top:8px; max-width:88%; margin-left:auto; margin-right:auto; }
+  /* — Balken exakt von Zahl bis LIVE — */
+  .barWrap{
+    margin-top:8px;
+    height:10px;
+    position:relative;
+  }
   .bar{
     position:relative; height:10px; border-radius:999px; overflow:hidden;
     background:linear-gradient(180deg, #0c1323, #0a1120); border:1px solid var(--line);
+    width:100%;
   }
   .bar .fill{
     position:absolute; inset:0; width:0%;
@@ -93,10 +98,10 @@
     transition: width .7s cubic-bezier(.2,.8,.2,1);
   }
 
-  .ticks{position:relative; height:0; margin-top:8px}
-  /* Ticks dicker, aber Labels noch kleiner */
-  .tick{position:absolute; top:-7px; width:3px; height:22px; background:#3a5a95; border-radius:3px}
-  .tick label{position:absolute; top:22px; transform:translateX(-50%); color:var(--muted); font-size:9px; font-weight:900; white-space:nowrap}
+  /* Ticks: gleiche Größe der Labels, aber Linien dünner & kürzer */
+  .ticks{position:relative; height:0; margin-top:6px}
+  .tick{position:absolute; top:-5px; width:2px; height:16px; background:#3a5a95; border-radius:2px}
+  .tick label{position:absolute; top:16px; transform:translateX(-50%); color:var(--muted); font-size:9px; font-weight:900; white-space:nowrap}
 
   .pair{ margin-top:6px; color:var(--muted); display:flex; gap:6px; flex-wrap:wrap; font-weight:700; font-size:12px; }
   .pair strong{color:var(--text)}
@@ -141,20 +146,25 @@
   .stars{display:flex; align-items:center; gap:6px; font-variant-numeric:tabular-nums}
   .sstar{width:14px;height:14px;filter: drop-shadow(0 0 6px rgba(106,182,255,.8))}
 
-  /* Locks */
+  /* Schloss-Icons (pro Panel), nur EIN gemeinsames Modal */
   .lockOverlay{
     position:absolute; inset:0;
-    background:#0b0f17; /* voll blickdicht */
-    border:none;
-    border-radius:16px;
-    display:grid;
-    place-items:center;
-    z-index:4;
+    background:#0b0f17; border:none; border-radius:16px;
+    display:grid; place-items:center; z-index:4;
+  }
+  .lockIcon{ display:grid; place-items:center; gap:6px; text-align:center; opacity:.9; user-select:none; }
+  .lockIcon svg{ width:40px; height:40px; display:block; max-width:12vw; max-height:12vw; filter: drop-shadow(0 0 8px rgba(154,209,255,.22)); }
+  .lockIcon small{ color:var(--muted); letter-spacing:.15px; font-weight:800; text-transform:uppercase; font-size:10px }
+
+  /* Gemeinsames Passwort-Modal (zentriert über BEIDE Rankings) */
+  .rankLockModal{
+    position:fixed; inset:0; display:none; place-items:center;
+    background:linear-gradient(180deg, rgba(7,11,20,.86), rgba(7,11,20,.86));
+    z-index:999;
   }
   .lockCard{
     background:#0e1628; border:1px solid var(--line); border-radius:12px; padding:14px; min-width:260px;
-    display:none; /* erst beim Klick */
-    gap:8px; text-align:center; box-shadow:var(--glow);
+    display:grid; gap:8px; text-align:center; box-shadow:var(--glow);
   }
   .lockCard h3{ margin:0; font-size:14px; color:var(--muted); text-transform:uppercase; letter-spacing:.2px }
   .lockCard input{
@@ -164,11 +174,6 @@
     background:linear-gradient(180deg,#123361,#0b2244); color:#cfe3ff; border:1px solid #28508a;
     padding:8px 10px; border-radius:9px; font-weight:900; cursor:pointer;
   }
-
-  /* — Schloss kleiner & responsiv — */
-  .lockIcon{ display:grid; place-items:center; gap:6px; text-align:center; opacity:.9; user-select:none; }
-  .lockIcon svg{ width:40px; height:40px; display:block; max-width:12vw; max-height:12vw; filter: drop-shadow(0 0 8px rgba(154,209,255,.22)); }
-  .lockIcon small{ color:var(--muted); letter-spacing:.15px; font-weight:800; text-transform:uppercase; font-size:10px }
 
   /* Page gate */
   .pageGate{
@@ -205,6 +210,15 @@
   </div>
 </div>
 
+<!-- Gemeinsames Ranking-Passwort-Modal -->
+<div class="rankLockModal" id="rankLockModal" aria-hidden="true">
+  <div class="lockCard" role="dialog" aria-modal="true">
+    <h3>Ranking geschützt</h3>
+    <input type="password" id="rankPwd" placeholder="Passwort"/>
+    <button id="rankBtn">Entsperren</button>
+  </div>
+</div>
+
 <div class="wrap" aria-hidden="true" id="appRoot">
   <div class="top">
     <div class="updated" id="updatedAt">Aktualisiert: –</div>
@@ -223,15 +237,16 @@
 
   <div class="grid">
     <!-- TAGES-CHALLENGE -->
-    <section class="panel day">
+    <section class="panel day" id="dayPanel">
       <h2>TAGES-CHALLENGE</h2>
-      <div class="goalBig">
+      <div class="goalBig" id="goalBig">
         <span class="num truncate" id="dayGoalBig">0,00</span>
         <img class="star" alt="★" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='%239ad1ff' viewBox='0 0 24 24'><path d='M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.2l7.1-.6z'/></svg>">
-        <span class="badgeLive">LIVE</span>
+        <span class="badgeLive" id="badgeLive">LIVE</span>
       </div>
 
-      <div class="barWrap">
+      <!-- Balken passt sich per JS exakt an -->
+      <div class="barWrap" id="barWrap">
         <div class="bar"><div class="fill" id="dayFill"></div></div>
         <div class="ticks" id="dayTicks"></div>
       </div>
@@ -266,7 +281,6 @@
           <div class="pulse" aria-hidden="true"></div>
         </div>
 
-        <!-- Großes IST/ZIEL rechts neben Kreis -->
         <div class="weekPair">
           <span id="weekIstBig">0,00</span>
           <img class="star" alt="★" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' fill='%2359a6ff' viewBox='0 0 24 24'><path d='M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.2l7.1-.6z'/></svg>">
@@ -281,8 +295,7 @@
     <section class="panel rankD" id="rankDPanel">
       <h2>Tagesranking</h2>
       <div class="list" id="dayList"></div>
-      <div class="lockOverlay" id="lockRank">
-        <!-- Schloss-Symbol -->
+      <div class="lockOverlay" id="lockRankDay">
         <div class="lockIcon" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="#9ad1ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3.5" y="11" width="17" height="10" rx="2" ry="2"></rect>
@@ -291,18 +304,22 @@
           </svg>
           <small>Gesperrt</small>
         </div>
-        <div class="lockCard">
-          <h3>Ranking geschützt</h3>
-          <input type="password" id="rankPwd" placeholder="Passwort"/>
-          <button id="rankBtn">Entsperren</button>
-        </div>
       </div>
     </section>
 
     <section class="panel rankW" id="rankWPanel">
       <h2>Wochenranking</h2>
       <div class="list" id="weekList"></div>
-      <!-- Overlay wird per JS geklont -->
+      <div class="lockOverlay" id="lockRankWeek">
+        <div class="lockIcon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#9ad1ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3.5" y="11" width="17" height="10" rx="2" ry="2"></rect>
+            <path d="M7 11V8a5 5 0 0 1 10 0v3"></path>
+            <circle cx="12" cy="16" r="1.8" fill="#59a6ff" stroke="none"></circle>
+          </svg>
+          <small>Gesperrt</small>
+        </div>
+      </div>
     </section>
   </div>
 </div>
@@ -344,7 +361,7 @@ function buildList(el, items){
   });
 }
 
-/* 0%-Tick entfernt, restliche Ticks gebaut */
+/* Ticks: 0% entfernt, Linien dünner/kürzer */
 function buildDayTicks(){
   const ticksEl = document.getElementById("dayTicks"); ticksEl.innerHTML = "";
   [25,50,75,100].forEach(p=>{
@@ -354,6 +371,7 @@ function buildDayTicks(){
   });
 }
 
+/* Week ring animation */
 function ringTo(circle, pct, dur=800){
   const C = 2*Math.PI*52;
   const from = Number(circle._pct || 0); const to = Math.max(0, Math.min(100, pct));
@@ -363,7 +381,26 @@ function ringTo(circle, pct, dur=800){
   } requestAnimationFrame(f);
 }
 
-/* ===== DATA ===== */
+/* Tages-Balken exakt an Zahl(L) bis LIVE(R) anpassen */
+function alignDayBar(){
+  const day = document.getElementById('dayPanel');
+  const num = document.getElementById('dayGoalBig');
+  const live = document.getElementById('badgeLive');
+  const barWrap = document.getElementById('barWrap');
+  if(!day || !num || !live || !barWrap) return;
+
+  const rDay = day.getBoundingClientRect();
+  const rNum = num.getBoundingClientRect();
+  const rLive = live.getBoundingClientRect();
+
+  const left = Math.max(0, rNum.left - rDay.left);
+  const width = Math.max(0, rLive.right - rNum.left);
+
+  barWrap.style.marginLeft = left + 'px';
+  barWrap.style.width = width + 'px';
+}
+
+/* ===== STATE/DATA ===== */
 let state = { data:null, idx:0 };
 
 async function fetchData(){
@@ -386,6 +423,7 @@ function applyChallenge(ch){
   document.getElementById("dayGoalPair").textContent = fmtInt(dGoal);
   document.getElementById("dayFill").style.width = Math.max(0, Math.min(100, dPct)) + "%";
   buildDayTicks();
+  alignDayBar();
 
   // Week
   ringTo(document.getElementById("ringProgress"), wPct);
@@ -415,6 +453,7 @@ function updateUI(payload){
 
   buildList(document.getElementById("dayList"),  payload.day  || []);
   buildList(document.getElementById("weekList"), payload.week || []);
+  alignDayBar();
 }
 
 /* ===== AUTH (Page) ===== */
@@ -437,53 +476,46 @@ function loadWithTTL(key){
   });
 })();
 
-/* ===== AUTH (Rankings) ===== */
+/* ===== AUTH (Rankings) – gemeinsames Modal ===== */
+function showRankModal(){
+  const m = document.getElementById('rankLockModal');
+  m.style.display = 'grid';
+  const inp = document.getElementById('rankPwd');
+  inp.value = '';
+  setTimeout(()=>inp.focus(), 0);
+}
+function hideRankModal(){
+  document.getElementById('rankLockModal').style.display = 'none';
+}
 function unlockRankings(){
-  const ol = document.getElementById("lockRank");
-  ol.style.display="none";
+  document.getElementById('lockRankDay').style.display = 'none';
+  document.getElementById('lockRankWeek').style.display = 'none';
+  hideRankModal();
 }
 (function rankAuthInit(){
   const saved = loadWithTTL("rhodenburg_rank", DAY_MS);
-  const ol = document.getElementById("lockRank");
-  const rankW = document.getElementById("rankWPanel");
+  const dayOv = document.getElementById("lockRankDay");
+  const weekOv = document.getElementById("lockRankWeek");
+  const btn = document.getElementById("rankBtn");
+  const inp = document.getElementById("rankPwd");
+  const modal = document.getElementById("rankLockModal");
 
-  // zweites Overlay klonen
-  const clone = ol.cloneNode(true);
-  rankW.appendChild(clone);
-
-  function hideBoth(){
-    ol.style.display="none";
-    clone.style.display="none";
+  function clickHandler(e){
+    if(dayOv.style.display !== "none" || weekOv.style.display !== "none"){
+      showRankModal();
+    }
   }
+  dayOv.addEventListener('click', clickHandler);
+  weekOv.addEventListener('click', clickHandler);
 
-  function wire(overlay){
-    const card = overlay.querySelector(".lockCard");
-    const icon = overlay.querySelector(".lockIcon");
-    const btn  = overlay.querySelector("button");
-    const inp  = overlay.querySelector("input");
+  btn.addEventListener("click", ()=>{
+    if((inp.value||"").trim() === RANK_PWD){ saveWithTTL("rhodenburg_rank", true, DAY_MS); unlockRankings(); }
+    else alert("Falsches Passwort.");
+  });
+  inp.addEventListener("keydown", e=>{ if(e.key==="Enter") btn.click(); });
+  modal.addEventListener("click", (e)=>{ if(e.target === modal) hideRankModal(); });
 
-    // Erst beim Klick auf den gesperrten Bereich die Karte zeigen
-    overlay.addEventListener("click", ()=>{
-      if(overlay.style.display !== "none" && card.style.display !== "grid"){
-        if(icon) icon.style.display = "none";
-        card.style.display = "grid";
-        inp.focus();
-      }
-    });
-
-    // Interaktion in der Karte
-    btn.addEventListener("click", ()=>{
-      if((inp.value||"").trim() === RANK_PWD){ saveWithTTL("rhodenburg_rank", true, DAY_MS); hideBoth(); }
-      else alert("Falsches Passwort.");
-    });
-    inp.addEventListener("keydown", e=>{ if(e.key==="Enter") btn.click(); });
-
-    // Klicks in der Karte nicht „durchreichen“
-    card.addEventListener("click", e=>e.stopPropagation());
-  }
-
-  wire(ol); wire(clone);
-  if(saved === true) hideBoth();
+  if(saved === true) unlockRankings();
 })();
 
 /* ===== INIT ===== */
@@ -497,6 +529,9 @@ function init(){
   // Live-Daten
   fetchData().then(updateUI).catch(console.error);
   setInterval(async()=>{ try{ updateUI(await fetchData()) }catch(e){} }, POLL_MS);
+
+  // Re-Align on resize
+  window.addEventListener('resize', alignDayBar);
 }
 
 // Falls Page-Auth bereits aktiv war
