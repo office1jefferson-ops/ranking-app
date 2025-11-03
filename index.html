@@ -502,12 +502,15 @@ async function fetchData(){
 }
 
 function applyChallenge(ch){
+  // Werte aus JSON: bevorzugt 'live', Fallback 'ist'
   const dGoal = Number(ch?.day?.ziel || 0);
-  const dIst  = Number(ch?.day?.ist  || 0);
+  const dIst  = Number((ch?.day?.live ?? ch?.day?.ist) || 0);
   const wGoal = Number(ch?.week?.ziel || 0);
-  const wIst  = Number(ch?.week?.ist  || 0);
-  const wPct  = Number(ch?.week?.progressPct || (wGoal>0? (wIst/wGoal)*100:0));
-  const dPct  = Number(ch?.day?.progressPct  || (dGoal>0? (dIst/dGoal)*100:0));
+  const wIst  = Number((ch?.week?.live ?? ch?.week?.ist) || 0);
+
+  // Prozent (Fallbacks, falls progressPct fehlt)
+  const wPct  = Number(ch?.week?.progressPct ?? (wGoal > 0 ? (wIst / wGoal) * 100 : 0));
+  const dPct  = Number(ch?.day?.progressPct  ?? (dGoal > 0 ? (dIst / dGoal) * 100 : 0));
 
   // Day
   tween(document.getElementById("dayGoalBig"), dGoal, "num");
@@ -520,9 +523,10 @@ function applyChallenge(ch){
   // Week
   ringTo(document.getElementById("ringProgress"), wPct);
   tween(document.getElementById("weekPct"), wPct, "pct");
-  document.getElementById("weekIstBig").textContent  = fmtDE(wIst);
-  document.getElementById("weekGoalBig").textContent = fmtDE(wGoal);
+  document.getElementById("weekIstBig").textContent  = fmtDE2(wIst);
+  document.getElementById("weekGoalBig").textContent = fmtDE2(wGoal);
 }
+
 
 function updateUI(payload){
   window.state.data = payload;
